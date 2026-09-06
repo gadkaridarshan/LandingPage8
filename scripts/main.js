@@ -1,33 +1,30 @@
 // helix: scripts/main.js
-// Lightweight site behavior — header year + smooth in-page anchors.
+// @helix:story USER-917000
+// Page-level bootstrapping for the Lumen landing page.
+// Exposes the contact endpoint used by scripts/contact.js and runs
+// small presentational niceties that don't belong to a specific section.
+
 (function () {
   "use strict";
 
-  function init() {
-    var yearEl = document.getElementById("year");
-    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+  // Configurable JSON endpoint for the contact form.
+  // Override at runtime by setting window.LUMEN_CONTACT_ENDPOINT
+  // before this script executes (e.g. via an inline <script> tag).
+  if (typeof window.LUMEN_CONTACT_ENDPOINT !== "string") {
+    window.LUMEN_CONTACT_ENDPOINT = "/api/contact";
+  }
 
-    // Smooth-scroll for in-page anchor links that target an existing section.
-    var anchors = document.querySelectorAll('a[href^="#"]');
-    for (var i = 0; i < anchors.length; i++) {
-      anchors[i].addEventListener("click", function (event) {
-        var href = this.getAttribute("href");
-        if (!href || href === "#" || href.length < 2) return;
-        var target = document.getElementById(href.slice(1));
-        if (!target) return;
-        event.preventDefault();
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        if (target.setAttribute) {
-          target.setAttribute("tabindex", "-1");
-          target.focus({ preventScroll: true });
-        }
-      });
+  /** Keep the footer copyright year current without a build step. */
+  function updateFooterYear() {
+    var yearEl = document.getElementById("footer-year");
+    if (yearEl) {
+      yearEl.textContent = String(new Date().getFullYear());
     }
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", updateFooterYear);
   } else {
-    init();
+    updateFooterYear();
   }
 })();
