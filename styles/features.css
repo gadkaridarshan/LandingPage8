@@ -1,57 +1,177 @@
-/* helix: styles/features.css
-   Features section styling for USER-113000. */
+/* @helix:story USER-920000 — Features section */
 
 .features {
-  padding: clamp(var(--space-8), 8vw, var(--space-9)) 0;
-  background:
-    radial-gradient(700px 380px at 90% 0%, rgba(79, 70, 229, 0.06), transparent 60%),
-    radial-gradient(600px 320px at 0% 100%, rgba(34, 211, 238, 0.06), transparent 60%),
-    var(--color-surface);
+  position: relative;
+  padding: clamp(4rem, 8vw, 7rem) 0 clamp(4rem, 8vw, 7rem);
+  isolation: isolate;
+  overflow: hidden;
 }
 
+/* Polished background — soft radial + linear wash that picks up the page palette */
+.features::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1100px 520px at 12% -10%, rgba(124, 92, 255, 0.18), transparent 60%),
+    radial-gradient(900px 460px at 110% 20%, rgba(56, 189, 248, 0.16), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.00));
+  pointer-events: none;
+}
+
+/* Subtle dotted texture overlay for depth */
+.features::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: 0 0;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 75%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 75%);
+  pointer-events: none;
+}
+
+/* Section heading block */
+.section-head {
+  max-width: 720px;
+  margin: 0 auto clamp(2.5rem, 5vw, 3.5rem);
+  text-align: center;
+}
+
+.section-head__title {
+  font-family: var(--font-sans, "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+  font-weight: 700;
+  font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0.75rem 0 0.75rem;
+  color: var(--ink, #0b1020);
+}
+
+.section-head__sub {
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--ink-muted, #475066);
+  margin: 0;
+}
+
+/* Eyebrow label shared with hero/contact sections */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted, #475066);
+  margin: 0;
+}
+
+.eyebrow--center {
+  justify-content: center;
+}
+
+.eyebrow__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7c5cff, #38bdf8);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.12);
+}
+
+/* Feature grid */
 .feature-grid {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: var(--space-5);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
 }
 
+@media (max-width: 960px) {
+  .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Feature card */
 .feature-card {
-  padding: var(--space-6);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: clamp(1.5rem, 2.4vw, 2rem);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.72)),
+    rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 18px 40px -28px rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 }
 
-.feature-card:hover {
+.feature-card:hover,
+.feature-card:focus-within {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(79, 70, 229, 0.25);
+  border-color: rgba(124, 92, 255, 0.35);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 28px 60px -28px rgba(76, 52, 196, 0.45);
 }
 
 .feature-card__icon {
-  width: 44px;
-  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-  margin-bottom: var(--space-4);
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c5cff 0%, #38bdf8 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 8px 20px -10px rgba(76, 52, 196, 0.6);
 }
 
 .feature-card__title {
+  font-family: var(--font-sans, "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
   font-size: 1.125rem;
-  margin-bottom: var(--space-2);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 0;
+  color: var(--ink, #0b1020);
 }
 
 .feature-card__body {
-  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-muted, #475066);
   margin: 0;
-  font-size: 0.975rem;
+}
+
+/* Reduced motion: keep the layout, drop the hover lift */
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    transition: none;
+  }
+  .feature-card:hover,
+  .feature-card:focus-within {
+    transform: none;
+  }
 }
