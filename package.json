@@ -1,4 +1,25 @@
-{
-  "name": "LandingPage8",
-  "version": "1.0.0"
-}
+## What was built
+
+The completed board work produced a fully functional single-page marketing
+landing page for Lumen, including:
+
+- **Hero Section** — Prominent headline, supporting subheadline, and primary
+  call-to-action button. Styled with modern Inter typography, polished gradient
+  background, and responsive layout for all screen sizes.
+
+- **Features Section** — A responsive grid of feature cards (3–6 items),
+  each with a custom SVG icon, feature title, and descriptive text. The grid
+  adapts from three columns on desktop to a single column on mobile.
+
+- **Contact Form Section** — A complete contact form with labeled inputs
+  for name, email, and message, client-side validation with accessible error
+  messages, submit handling with loading state, and graceful fallback to
+  `mailto:` when the backend is unavailable.
+
+- **Foundation** — CSS reset, base typography, utility classes, and a
+  cohesive design system (CSS variables, `clamp()` for fluid sizing,
+  consistent color palette, and accessible focus states).
+
+- **Polish** — Smooth scroll behavior, gradient backgrounds, subtle shadows,
+  hover transitions on interactive elements, and a professional visual
+  treatment throughout.

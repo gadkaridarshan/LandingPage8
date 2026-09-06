@@ -35,10 +35,7 @@ no client-side dependency to install.
 
 ## Running locally
 
-The project has no build step. Every file under `public/` and `styles/` is
-shipped to the browser as-is.
-
-1. **Install the local dev dependency.**
+1. **Install dependencies.**
 
    ```bash
    npm install
@@ -47,7 +44,7 @@ shipped to the browser as-is.
    This installs `serve` (declared in `package.json` `devDependencies`) so
    `npm run preview` can launch it via `npx`.
 
-2. **Run a quick syntax check (optional but recommended).**
+2. **Run the JavaScript syntax checker (optional but recommended).**
 
    ```bash
    npm run typecheck:js
@@ -56,7 +53,7 @@ shipped to the browser as-is.
    This runs `node --check` against every file in `scripts/` and `server/`
    so syntax errors surface before you start the server.
 
-3. **Start the local preview server.**
+3. **Start the preview server.**
 
    ```bash
    npm run preview
@@ -65,7 +62,7 @@ shipped to the browser as-is.
    This runs `serve --no-clipboard public`, which serves the `public/`
    directory on port `3000` by default.
 
-4. **Verify the page is up.**
+4. **Verify the page loads correctly.**
 
    Open <http://localhost:3000/> in a modern browser. You should see:
 
@@ -77,6 +74,6 @@ shipped to the browser as-is.
      accepts client-side validation, and posts to `/api/contact` when the
      backend is reachable (or opens a `mailto:` fallback otherwise).
 
-If all of the above check out, the local environment is healthy.
+   If all three sections render correctly, the local environment is healthy.
 
 ## Project Structure
