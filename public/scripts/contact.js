@@ -1,78 +1,120 @@
-/**
- * Contact Form Handler
- * @helix:story USER-989000
- */
+/* helix: public/scripts/contact.js */
 
-(function() {
+// Contact Form Handler
+// Validates and submits the contact form to the backend API
+
+(function () {
   'use strict';
 
-  const form = document.getElementById('contact-form');
-  const submitBtn = form?.querySelector('.btn--submit');
-  const successMessage = document.getElementById('form-success');
+  // DOM Elements
+  const contactForm = document.getElementById('contact-form');
+  const formStatus = document.querySelector('.form__status');
 
-  if (!form) {
-    console.warn('Contact form not found');
+  if (!contactForm) {
+    console.warn('Contact form not found on this page.');
     return;
   }
 
-  /**
-   * Validation patterns and rules
-   */
-  const validators = {
+  // Form field configuration
+  const fields = {
     name: {
+      element: document.getElementById('name'),
       validate: (value) => {
-        const trimmed = value.trim();
-        if (!trimmed) return 'Please enter your name';
-        if (trimmed.length < 2) return 'Name must be at least 2 characters';
-        if (trimmed.length > 100) return 'Name must be less than 100 characters';
+        if (!value.trim()) {
+          return 'Full name is required';
+        }
+        if (value.trim().length < 2) {
+          return 'Name must be at least 2 characters';
+        }
+        if (value.trim().length > 100) {
+          return 'Name must be less than 100 characters';
+        }
         return null;
       }
     },
     email: {
+      element: document.getElementById('email'),
       validate: (value) => {
-        const trimmed = value.trim();
-        if (!trimmed) return 'Please enter your email address';
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(trimmed)) return 'Please enter a valid email address';
+        if (!value.trim()) {
+          return 'Email address is required';
+        }
+        // Basic email regex pattern
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(value.trim())) {
+          return 'Please enter a valid email address';
+        }
+        return null;
+      }
+    },
+    company: {
+      element: document.getElementById('company'),
+      validate: (value) => {
+        if (value.trim().length > 0 && value.trim().length < 2) {
+          return 'Company name must be at least 2 characters';
+        }
+        if (value.trim().length > 100) {
+          return 'Company name must be less than 100 characters';
+        }
         return null;
       }
     },
     message: {
+      element: document.getElementById('message'),
       validate: (value) => {
-        const trimmed = value.trim();
-        if (!trimmed) return 'Please enter a message';
-        if (trimmed.length < 10) return 'Message must be at least 10 characters';
-        if (trimmed.length > 2000) return 'Message must be less than 2000 characters';
+        if (!value.trim()) {
+          return 'Message is required';
+        }
+        if (value.trim().length < 10) {
+          return 'Message must be at least 10 characters';
+        }
+        if (value.trim().length > 2000) {
+          return 'Message must be less than 2000 characters';
+        }
         return null;
       }
     }
   };
 
   /**
+   * Show error state for a field
+   * @param {HTMLElement} field - The field container
+   * @param {string} message - Error message
+   */
+  function showFieldError(field, message) {
+    const formGroup = field.closest('.form-group');
+    const errorEl = formGroup.querySelector('.error-message');
+    
+    formGroup.classList.add('error');
+    if (errorEl) {
+      errorEl.textContent = message;
+    }
+  }
+
+  /**
+   * Clear error state for a field
+   * @param {HTMLElement} field - The field element
+   */
+  function clearFieldError(field) {
+    const formGroup = field.closest('.form-group');
+    formGroup.classList.remove('error');
+  }
+
+  /**
    * Validate a single field
-   * @param {HTMLInputElement|HTMLTextAreaElement} field
+   * @param {string} fieldName - Name of the field to validate
    * @returns {boolean} - Whether the field is valid
    */
-  function validateField(field) {
-    const fieldName = field.name;
-    const validator = validators[fieldName];
-    const errorElement = document.getElementById(`${fieldName}-error`);
-    
-    if (!validator) return true;
+  function validateField(fieldName) {
+    const field = fields[fieldName];
+    if (!field || !field.element) return true;
 
-    const error = validator.validate(field.value);
+    const error = field.validate(field.element.value);
     
-    if (errorElement) {
-      errorElement.textContent = error || '';
-    }
-
     if (error) {
-      field.classList.add('error');
-      field.setAttribute('aria-invalid', 'true');
+      showFieldError(field.element, error);
       return false;
     } else {
-      field.classList.remove('error');
-      field.removeAttribute('aria-invalid');
+      clearFieldError(field.element);
       return true;
     }
   }
@@ -82,165 +124,196 @@
    * @returns {boolean} - Whether all fields are valid
    */
   function validateForm() {
-    const fields = form.querySelectorAll('input[name], textarea[name]');
     let isValid = true;
-
-    fields.forEach(field => {
-      if (!validateField(field)) {
+    
+    Object.keys(fields).forEach((fieldName) => {
+      const fieldValid = validateField(fieldName);
+      if (!fieldValid) {
         isValid = false;
       }
     });
-
+    
     return isValid;
   }
 
   /**
-   * Clear all validation errors
+   * Set loading state on the submit button
+   * @param {boolean} loading - Whether to show loading state
    */
-  function clearValidation() {
-    const fields = form.querySelectorAll('input, textarea');
-    fields.forEach(field => {
-      field.classList.remove('error');
-      field.removeAttribute('aria-invalid');
+  function setLoadingState(loading) {
+    const submitBtn = contactForm.querySelector('.btn--primary');
+    
+    if (loading) {
+      submitBtn.classList.add('btn--loading');
+      submitBtn.disabled = true;
+    } else {
+      submitBtn.classList.remove('btn--loading');
+      submitBtn.disabled = false;
+    }
+  }
+
+  /**
+   * Show form status message
+   * @param {string} message - Status message
+   * @param {string} type - 'success' or 'error'
+   */
+  function showStatus(message, type) {
+    formStatus.textContent = message;
+    formStatus.className = 'form__status';
+    formStatus.classList.add(`form__status--${type}`);
+    formStatus.style.display = 'block';
+    
+    // Scroll to status message
+    formStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  /**
+   * Hide form status message
+   */
+  function hideStatus() {
+    formStatus.style.display = 'none';
+    formStatus.className = 'form__status';
+  }
+
+  /**
+   * Collect form data
+   * @returns {Object} - Form data object
+   */
+  function collectFormData() {
+    return {
+      name: fields.name.element.value.trim(),
+      email: fields.email.element.value.trim(),
+      company: fields.company.element.value.trim(),
+      message: fields.message.element.value.trim()
+    };
+  }
+
+  /**
+   * Submit form data to the API
+   * @param {Object} data - Form data to submit
+   * @returns {Promise<Object>} - Response data
+   */
+  async function submitForm(data) {
+    const response = await fetch(contactForm.action || '/api/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
     });
 
-    const errorElements = form.querySelectorAll('.form-error');
-    errorElements.forEach(el => {
-      el.textContent = '';
+    if (!response.ok) {
+      let errorMessage = 'Failed to send message. Please try again.';
+      
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        // Use default error message
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Reset the form to its initial state
+   */
+  function resetForm() {
+    contactForm.reset();
+    Object.keys(fields).forEach((fieldName) => {
+      if (fields[fieldName].element) {
+        clearFieldError(fields[fieldName].element);
+      }
     });
-  }
-
-  /**
-   * Show loading state
-   */
-  function showLoading() {
-    submitBtn.classList.add('loading');
-    submitBtn.disabled = true;
-  }
-
-  /**
-   * Hide loading state
-   */
-  function hideLoading() {
-    submitBtn.classList.remove('loading');
-    submitBtn.disabled = false;
-  }
-
-  /**
-   * Show success message
-   */
-  function showSuccess() {
-    successMessage.hidden = false;
-    form.reset();
-    clearValidation();
-  }
-
-  /**
-   * Hide success message
-   */
-  function hideSuccess() {
-    successMessage.hidden = true;
+    hideStatus();
   }
 
   /**
    * Handle form submission
-   * @param {Event} event
+   * @param {Event} event - Form submit event
    */
   async function handleSubmit(event) {
     event.preventDefault();
     
-    hideSuccess();
-    clearValidation();
-
+    // Clear previous status
+    hideStatus();
+    
+    // Validate form
     if (!validateForm()) {
-      const firstError = form.querySelector('.error');
+      // Focus first error field
+      const firstError = contactForm.querySelector('.form-group.error input, .form-group.error textarea');
       if (firstError) {
         firstError.focus();
       }
       return;
     }
 
-    showLoading();
-
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+    // Set loading state
+    setLoadingState(true);
 
     try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
-      showSuccess();
+      const formData = collectFormData();
+      await submitForm(formData);
+      
+      // Show success message
+      showStatus('Thank you for your message! We\'ll get back to you within 24 hours.', 'success');
+      
+      // Reset form after short delay
+      setTimeout(() => {
+        resetForm();
+      }, 3000);
+      
     } catch (error) {
-      console.error('Form submission error:', error);
-      
-      // For demo purposes, show success even if server isn't available
-      // In production, you'd want to show a proper error message
-      const isDemoMode = form.action === '/api/contact';
-      
-      if (isDemoMode) {
-        showSuccess();
-      } else {
-        hideLoading();
-        alert('There was an error sending your message. Please try again later.');
-      }
+      // Show error message
+      showStatus(error.message || 'Something went wrong. Please try again later.', 'error');
     } finally {
-      if (form.action !== '/api/contact') {
-        hideLoading();
+      // Clear loading state
+      setLoadingState(false);
+    }
+  }
+
+  // Initialize event listeners
+  function init() {
+    // Form submission
+    contactForm.addEventListener('submit', handleSubmit);
+
+    // Real-time validation on blur
+    Object.keys(fields).forEach((fieldName) => {
+      const field = fields[fieldName];
+      if (field.element) {
+        field.element.addEventListener('blur', () => {
+          // Only validate if field has been touched
+          if (field.element.value.trim()) {
+            validateField(fieldName);
+          }
+        });
+
+        // Clear error on input
+        field.element.addEventListener('input', () => {
+          clearFieldError(field.element);
+        });
       }
+    });
+
+    // Handle external clear button if present
+    const clearBtn = contactForm.querySelector('.btn--clear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetForm();
+      });
     }
   }
 
-  /**
-   * Handle input changes (clear errors on type)
-   * @param {Event} event
-   */
-  function handleInput(event) {
-    const field = event.target;
-    if (field.classList.contains('error')) {
-      field.classList.remove('error');
-      const errorElement = document.getElementById(`${field.name}-error`);
-      if (errorElement) {
-        errorElement.textContent = '';
-      }
-    }
+  // Start initialization when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
-
-  /**
-   * Handle blur events (validate on leave)
-   * @param {Event} event
-   */
-  function handleBlur(event) {
-    const field = event.target;
-    if (field.name && validators[field.name]) {
-      validateField(field);
-    }
-  }
-
-  // Event listeners
-  form.addEventListener('submit', handleSubmit);
-
-  // Add live validation on input
-  const fields = form.querySelectorAll('input, textarea');
-  fields.forEach(field => {
-    field.addEventListener('input', handleInput);
-    field.addEventListener('blur', handleBlur);
-  });
-
-  // Handle browser validation
-  form.addEventListener('invalid', (event) => {
-    event.preventDefault();
-    const field = event.target;
-    validateField(field);
-  }, true);
-
 })();
