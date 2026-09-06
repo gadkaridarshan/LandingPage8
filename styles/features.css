@@ -1,0 +1,109 @@
+/* helix: styles/features.css */
+
+/* =============================================
+   Features Section Styles
+   ============================================= */
+
+.features {
+  position: relative;
+  padding: clamp(4rem, 8vw, 7rem) 0;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.features::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.08), transparent);
+}
+
+.features__header {
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.features__title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  color: #0f172a;
+}
+
+.features__subtitle {
+  font-size: clamp(0.9375rem, 2vw, 1.125rem);
+  line-height: 1.65;
+  color: #64748b;
+  margin: 0;
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Features Grid */
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+
+/* Feature Card */
+.feature-card {
+  position: relative;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.06), 0 12px 30px rgba(15, 23, 42, 0.08);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.feature-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  border-radius: 0.75rem;
+}
+
+.feature-card__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #6366f1;
+}
+
+.feature-card__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 0.75rem;
+  color: #0f172a;
+}
+
+.feature-card__desc {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .features__grid {
+    grid-template-columns: 1fr;
+  }
+}

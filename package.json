@@ -1,44 +1,4 @@
-## What was built
-
-The following deliverables were completed on this board:
-
-- **Hero Section** — Top-of-page region with headline, supporting subheadline, and primary call-to-action button. Uses Inter font stack, accessible sizing, polished gradient background, and responsive layout.
-
-- **Features Section** — Mid-page grid of 3–6 feature cards each with an icon, title, and description. Modern typography, clear hierarchy, and polished gradient backdrop. Responsive: 1 column on mobile, 2–3 columns on desktop.
-
-- **Contact Form Section** — Bottom section with labelled input fields (name, email, message), client-side validation with accessible error messages, and submit handler. Gracefully falls back to `mailto:` when the backend endpoint is unavailable.
-
-- **CSS Integration Fix** — Diagnosed and resolved stylesheet linking issues ensuring all CSS files are properly loaded and applied across the landing page.
-
-- **Complete README** — Canonical entry point documenting prerequisites, local run steps, project structure, and completed deliverables.
-
-## Production Deployment
-
-The page is fully static and requires no build step. Deploy by uploading the
-contents of this repository to any static-file host.
-
-### GitHub Pages
-
-1. Push this repository to GitHub.
-2. In the repository **Settings → Pages**, select the branch to deploy
-   (e.g., `main`) and the root folder.
-3. The site will be available at `https://<username>.github.io/<repo-name>/`.
-
-### Netlify
-
-1. Drag and drop this repository folder onto
-   [app.netlify.com/drop](https://app.netlify.com/drop).
-2. Netlify will detect the static site and publish it with a random
-   subdomain. Connect a custom domain in **Site settings → Domain
-   management** if desired.
-
-### Cloudflare Pages
-
-1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/).
-2. Navigate to **Workers & Pages → Create application → Pages → Connect to Git**.
-3. Select the repository and configure the build pipeline (no build command
-   needed for a fully static site — set **Build output directory** to `/`).
-4. Deploy. Cloudflare will provide a `*.pages.dev` URL; add a custom domain
-   via **Custom domains** in the project settings.
-
-### Self-hosted (nginx)
+{
+  "name": "LandingPage8",
+  "version": "1.0.0"
+}

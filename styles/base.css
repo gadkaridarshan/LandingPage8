@@ -53,10 +53,10 @@ button {
   cursor: pointer;
   border: none;
   background: none;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
-
-/* Utility Classes */
-.container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
