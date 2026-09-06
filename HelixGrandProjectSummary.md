@@ -1,3 +1,3 @@
 # Grand Project Summary
 
-The landing page is now complete with a styled hero section (`public/index.html` + `styles/hero.css`), a responsive features grid (`styles/features.css`), and an accessible contact form with client-side validation (`public/index.html`, `styles/contact.css`, `scripts/contact.js`, `scripts/main.js`). The CSS integration issue was diagnosed and fixed — stylesheets are correctly linked in `public/index.html` with proper paths, eliminating the plain-HTML appearance. A canonical `README.md` documents the project overview, prerequisites, local run steps (`npm install`, `npm run typecheck:js`, `npm run preview`), project structure, and a production deployment guide with shell commands and success checks. All sections use the Inter font stack, subtle gradient backgrounds, and consistent professional typography across desktop and mobile breakpoints.
+_Will update whenever a card moves to Done._
