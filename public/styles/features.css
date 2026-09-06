@@ -1,4 +1,6 @@
-/* features.css */
+/* =============================================
+   Features Section Styles
+   ============================================= */
 
 .features {
   padding: 6rem 0;
@@ -59,6 +61,7 @@
   margin: 0 auto;
 }
 
+/* Feature Card */
 .feature-card {
   background: #ffffff;
   border-radius: 1rem;
@@ -89,42 +92,38 @@
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.04),
     0 12px 32px rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.1);
 }
 
 .feature-card:hover::before {
   opacity: 1;
 }
 
+/* Feature Card Icon */
 .feature-card__icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 0.875rem;
-  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  width: 3rem;
+  height: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  border-radius: 0.75rem;
+  margin-bottom: 1.25rem;
+  color: #4f46e5;
   transition: all 0.3s ease;
 }
 
 .feature-card:hover .feature-card__icon {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #ffffff;
+  transform: scale(1.05);
 }
 
 .feature-card__icon svg {
-  width: 28px;
-  height: 28px;
-  stroke: #6366f1;
-  stroke-width: 1.5;
-  fill: none;
-  transition: stroke 0.3s ease;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-.feature-card:hover .feature-card__icon svg {
-  stroke: #ffffff;
-}
-
+/* Feature Card Title */
 .feature-card__title {
   font-size: 1.25rem;
   font-weight: 700;
@@ -133,34 +132,36 @@
   letter-spacing: -0.01em;
 }
 
+/* Feature Card Description */
 .feature-card__desc {
   font-size: 1rem;
   color: #64748b;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
-/* Responsive adjustments */
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .features {
     padding: 4rem 0;
   }
 
   .features__header {
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
   }
 
   .features__grid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 1rem;
   }
 
   .feature-card {
-    padding: 1.75rem;
+    padding: 1.5rem;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .features__grid {
-    grid-template-columns: repeat(2, 1fr);
+/* Touch feedback for mobile */
+@media (hover: none) {
+  .feature-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
   }
 }
