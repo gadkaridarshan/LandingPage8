@@ -1,57 +1,3 @@
-# Lumen — Landing Page
-
-A polished, single-page marketing site for **Lumen**, a modern SaaS product. The
-page introduces the product in a hero section, showcases capabilities in a
-features grid, and lets visitors send inquiries through a contact form. The
-visual treatment is professional — tasteful gradients, generous whitespace,
-accessible typography, and accessible form controls — so the page reads as a
-finished product surface, not a placeholder.
-
-The frontend is fully static — plain HTML, CSS, and vanilla JavaScript served
-over HTTP — so it can be hosted on any static-file host (GitHub Pages, Netlify,
-Cloudflare Pages, S3 + CloudFront, `nginx`, etc.) or previewed locally without
-a build step. There is no framework runtime, no bundler, and no client-side
-dependency to install.
-
-## Prerequisites
-
-- **Node.js 18 or newer** — required to run `npm run preview` (which uses
-  `npx --yes serve`) and the `npm run typecheck:js` script, which validates
-  every JavaScript file with `node --check`. The `engines` field in
-  `package.json` enforces this minimum.
-- **npm 9+** — ships with Node.js 18; used to invoke `npx` and (optionally) to
-  install `serve` as a dev dependency declared in `package.json`.
-- **A modern browser** — Chrome, Firefox, Safari, or Edge — for local preview
-  and contact-form interaction. The page uses modern CSS (custom properties,
-  `clamp()`, CSS Grid, `aspect-ratio`) and ES2019+ JavaScript.
-- **An HTTP origin** — the page must be served over `http://` or `https://`
-  (not opened via `file://`) so that relative asset paths, the Google Fonts
-  request, and the contact form's network submission behave correctly.
-
-## Local development
-
-The project has no build step. Every file under `public/` and `styles/` is
-shipped to the browser as-is.
-
-```bash
-# 1. Install the local dev dependency (serve)
-npm install
-
-# 2. Preview the site at http://localhost:3000
-npm run preview
-
-# 3. (Optional) Validate every script with --check
-npm run typecheck:js
-```
-
-`npm run preview` runs `serve --no-clipboard public`, which serves the
-`public/` directory on port `3000` by default. Override the port with
-`--listen`:
-
-```bash
-npx --yes serve --no-clipboard public --listen 4000
-```
-
 `npm run typecheck:js` runs `node --check` against each file in `scripts/`
 and `server/` so syntax errors surface before deployment.
 
@@ -123,7 +69,6 @@ contents of `public/` as static assets and leaves `styles/`, `scripts/`, and
 5. (Optional) Add a `netlify.toml` at the project root to lock in settings:
 
    ```toml
-   # netlify.toml
    [build]
      publish = "public"
 
@@ -206,71 +151,3 @@ contents of `public/` as static assets and leaves `styles/`, `scripts/`, and
 
 A minimal nginx server block that serves the repo with `/api/contact`
 proxied to a local Node handler:
-
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name lumen.example.com;
-
-    root /var/www/lumen;
-    index public/index.html;
-
-    location / {
-        try_files $uri $uri/ /public/index.html;
-    }
-
-    location ~* ^/(styles|scripts)/ {
-        expires 1y;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-        access_log off;
-    }
-
-    location = /index.html {
-        add_header Cache-Control "no-cache";
-    }
-
-    location = /api/contact {
-        proxy_pass http://127.0.0.1:8787;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-Run the example contact handler locally with:
-
-```bash
-node server/contact-handler.example.js
-```
-
-By default it listens on `http://127.0.0.1:8787` and exposes `POST /contact`.
-
-### Verification
-
-After every deployment, walk through this checklist from a private browser
-window:
-
-1. **Page loads.** Visit the production URL and confirm the hero, features
-   grid, folders section, and contact form all render with no console errors.
-2. **Assets resolve.** Open DevTools → Network and confirm every request
-   returns `200` and the correct MIME type (CSS, JS, HTML, fonts).
-3. **Fonts load.** Headings should render in Inter, not the system fallback.
-4. **Navigation works.** Clicking each header link (`Features`, `Folders`,
-   `Contact`) scrolls to the matching section, and the focus ring is visible
-   on each link.
-5. **Keyboard reachability.** Press `Tab` from the URL bar; the skip link
-   should appear, and `Enter` should jump to `#main`.
-6. **Mobile layout.** Resize to ~375px wide — the hero, feature cards, and
-   form should stack without horizontal scroll.
-7. **Contact form.** Submit a test message. If `/api/contact` is wired up,
-   the request returns `200` and a success message appears. If not, the
-   form should fall back to a `mailto:` link.
-8. **Caching.** Reload the page — `/styles/*` and `/scripts/*` should be
-   served from cache (`(disk cache)` or `(memory cache)` in the Network
-   panel) on the second load.
-
-If every step passes, the deployment is healthy.
-
-## Project structure
