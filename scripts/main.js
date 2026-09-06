@@ -1,30 +1,33 @@
-// helix: scripts/main.js
-// @helix:story USER-917000
-// Page-level bootstrapping for the Lumen landing page.
-// Exposes the contact endpoint used by scripts/contact.js and runs
-// small presentational niceties that don't belong to a specific section.
+/* helix: scripts/main.js */
+/* Lightweight progressive enhancements for the Lumen landing page. */
 
 (function () {
-  "use strict";
+    "use strict";
 
-  // Configurable JSON endpoint for the contact form.
-  // Override at runtime by setting window.LUMEN_CONTACT_ENDPOINT
-  // before this script executes (e.g. via an inline <script> tag).
-  if (typeof window.LUMEN_CONTACT_ENDPOINT !== "string") {
-    window.LUMEN_CONTACT_ENDPOINT = "/api/contact";
-  }
-
-  /** Keep the footer copyright year current without a build step. */
-  function updateFooterYear() {
-    var yearEl = document.getElementById("footer-year");
-    if (yearEl) {
-      yearEl.textContent = String(new Date().getFullYear());
+    function initFooterYear() {
+        var yearEl = document.getElementById("footer-year");
+        if (!yearEl) return;
+        var now = new Date();
+        var year = now.getFullYear();
+        // If the markup already has a sensible static year, only override when it
+        // looks like a placeholder ("2024", "2025", etc.) — keep editorial control.
+        if (!/^\d{4}$/.test(yearEl.textContent || "")) {
+            yearEl.textContent = String(year);
+            return;
+        }
+        var parsed = Number.parseInt(yearEl.textContent, 10);
+        if (!Number.isFinite(parsed) || parsed < 2024) {
+            yearEl.textContent = String(year);
+        }
     }
-  }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", updateFooterYear);
-  } else {
-    updateFooterYear();
-  }
+    function init() {
+        initFooterYear();
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
 })();

@@ -1,250 +1,319 @@
-// helix: scripts/contact.js
-// @helix:story USER-779000
-// Client-side validation + submission for the Lumen contact form.
-// Posts JSON to window.LUMEN_CONTACT_ENDPOINT (default: "/api/contact").
-// Expected response shape:
-//   { "ok": true,  "message": "Thanks — we'll be in touch." }
-//   { "ok": false, "error":   "Email domain blocked." }
+/* helix: scripts/contact.js @helix:story USER-173000 */
+/* Contact form: client-side validation + POST to /api/contact with feedback UI. */
+
 (function () {
-  "use strict";
+    "use strict";
 
-  var DEFAULT_ENDPOINT = "/api/contact";
+    var DEFAULT_ENDPOINT = "/api/contact";
+    var SUBMIT_TIMEOUT_MS = 15000;
+    var STORAGE_KEY = "lumen.contact.lastSubmissionAt";
+    var MIN_SUBMIT_INTERVAL_MS = 8000; // simple client-side throttling
 
-  /** Light DOM helpers — kept local to this file. */
-  function $(sel, root) { return (root || document).querySelector(sel); }
-
-  /** RFC-light email regex. Intentionally permissive — the server is authoritative. */
-  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-  /** Field definitions — id, name, validators, and error messages. */
-  var FIELDS = [
-    {
-      id: "contact-name",
-      name: "name",
-      label: "Full name",
-      required: true,
-      validate: function (value) {
-        var v = String(value || "").trim();
-        if (!v) return "Please enter your full name.";
-        if (v.length < 2) return "Please enter your full name.";
-        if (v.length > 120) return "Name is too long (max 120 characters).";
-        return "";
-      },
-    },
-    {
-      id: "contact-email",
-      name: "email",
-      label: "Work email",
-      required: true,
-      validate: function (value) {
-        var v = String(value || "").trim();
-        if (!v) return "Please enter your work email.";
-        if (v.length > 254) return "Email is too long.";
-        if (!EMAIL_RE.test(v)) return "Please enter a valid email address.";
-        return "";
-      },
-    },
-    {
-      id: "contact-company",
-      name: "company",
-      label: "Company",
-      required: false,
-      validate: function (value) {
-        var v = String(value || "").trim();
-        if (v.length > 160) return "Company name is too long (max 160 characters).";
-        return "";
-      },
-    },
-    {
-      id: "contact-message",
-      name: "message",
-      label: "Message",
-      required: true,
-      validate: function (value) {
-        var v = String(value || "").trim();
-        if (!v) return "Please tell us a little about what you're working on.";
-        if (v.length < 10) return "Please add a bit more detail (at least 10 characters).";
-        if (v.length > 4000) return "Message is too long (max 4000 characters).";
-        return "";
-      },
-    },
-  ];
-
-  /**
-   * Reads the endpoint from window.LUMEN_CONTACT_ENDPOINT, falling back to the
-   * module default. Validates that it is a same-origin absolute or root-relative
-   * URL — we never POST credentials cross-origin.
-   */
-  function resolveEndpoint() {
-    var raw = (typeof window !== "undefined" && window.LUMEN_CONTACT_ENDPOINT) || DEFAULT_ENDPOINT;
-    if (typeof raw !== "string") return DEFAULT_ENDPOINT;
-    var trimmed = raw.trim();
-    if (!trimmed) return DEFAULT_ENDPOINT;
-    try {
-      var url = new URL(trimmed, window.location.origin);
-      if (url.origin !== window.location.origin) return DEFAULT_ENDPOINT;
-      return url.pathname + url.search + url.hash;
-    } catch (_e) {
-      // Allow root-relative paths like "/api/contact".
-      if (trimmed.charAt(0) !== "/") return DEFAULT_ENDPOINT;
-      return trimmed;
-    }
-  }
-
-  /**
-   * Validate a single field, updating the DOM with its error message and
-   * aria-invalid state. Returns true when the field is valid.
-   */
-  function validateField(def, value) {
-    var input = document.getElementById(def.id);
-    var errorEl = document.getElementById(def.id + "-error");
-    if (!input) return true;
-
-    var message = def.validate(value);
-    if (errorEl) errorEl.textContent = message;
-
-    var fieldWrapper = input.closest(".field");
-    if (fieldWrapper) fieldWrapper.classList.toggle("field--invalid", Boolean(message));
-
-    input.setAttribute("aria-invalid", message ? "true" : "false");
-    return !message;
-  }
-
-  /** Read the current value for a field. */
-  function readField(def) {
-    var el = document.getElementById(def.id);
-    return el ? el.value : "";
-  }
-
-  /** Update the live status region used by screen readers and visible feedback. */
-  function setStatus(form, message, state) {
-    var status = form.querySelector(".contact-form__status");
-    if (!status) return;
-    status.textContent = message || "";
-    if (state) status.setAttribute("data-state", state);
-    else status.removeAttribute("data-state");
-  }
-
-  /** Show a field-level error in the status region as a fallback. */
-  function setStatusError(form, message) {
-    setStatus(form, message, "error");
-  }
-
-  /** Submit handler — validates, posts JSON, and renders the response. */
-  function onSubmit(event) {
-    event.preventDefault();
-    var form = event.currentTarget;
-
-    // Validate every field; focus the first invalid one.
-    var firstInvalid = null;
-    for (var i = 0; i < FIELDS.length; i++) {
-      var def = FIELDS[i];
-      var ok = validateField(def, readField(def));
-      if (!ok && !firstInvalid) firstInvalid = document.getElementById(def.id);
-    }
-    if (firstInvalid) {
-      setStatusError(form, "Please fix the highlighted fields and try again.");
-      firstInvalid.focus();
-      return;
-    }
-
-    // Build the payload.
-    var payload = {};
-    for (var j = 0; j < FIELDS.length; j++) {
-      var f = FIELDS[j];
-      var raw = readField(f);
-      payload[f.name] = typeof raw === "string" ? raw.trim() : "";
-    }
-    payload.submittedAt = new Date().toISOString();
-
-    // Submit.
-    var submit = form.querySelector(".contact-form__submit");
-    var endpoint = resolveEndpoint();
-    form.classList.add("contact-form--loading");
-    if (submit) submit.disabled = true;
-    setStatus(form, "Sending…", null);
-
-    fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify(payload),
-    })
-      .then(function (res) {
-        return res.text().then(function (text) {
-          var data = null;
-          if (text) {
-            try { data = JSON.parse(text); } catch (_e) { /* leave data null */ }
-          }
-          return { ok: res.ok, status: res.status, data: data, raw: text };
-        });
-      })
-      .then(function (result) {
-        if (result.ok && result.data && result.data.ok !== false) {
-          setStatus(
-            form,
-            (result.data && result.data.message) || "Thanks — we'll be in touch within one business day.",
-            "success"
-          );
-          form.reset();
-          // Clear any lingering field errors.
-          for (var k = 0; k < FIELDS.length; k++) {
-            var fld = FIELDS[k];
-            var errEl = document.getElementById(fld.id + "-error");
-            if (errEl) errEl.textContent = "";
-            var wrap = document.getElementById(fld.id);
-            if (wrap && wrap.closest(".field")) wrap.closest(".field").classList.remove("field--invalid");
-          }
-        } else {
-          var serverMsg = (result.data && (result.data.error || result.data.message)) || "";
-          setStatusError(
-            form,
-            serverMsg || "Something went wrong sending your message. Please try again."
-          );
+    // Resolve endpoint from <form action> when available.
+    function getEndpoint(form) {
+        var attr = form.getAttribute("action");
+        if (attr && attr.trim() !== "" && attr !== "#") {
+            return attr;
         }
-      })
-      .catch(function () {
-        setStatusError(
-          form,
-          "We couldn't reach the server. Please check your connection and try again."
-        );
-      })
-      .then(function () {
-        form.classList.remove("contact-form--loading");
-        if (submit) submit.disabled = false;
-      });
-  }
-
-  /** Live re-validation on blur so users see errors clear as they edit. */
-  function bindLiveValidation(form) {
-    for (var i = 0; i < FIELDS.length; i++) {
-      (function (def) {
-        var input = document.getElementById(def.id);
-        if (!input) return;
-        input.addEventListener("blur", function () {
-          if (input.value !== "" || def.required) {
-            validateField(def, input.value);
-          }
-        });
-        input.addEventListener("input", function () {
-          var wrap = input.closest(".field");
-          if (wrap && wrap.classList.contains("field--invalid")) {
-            validateField(def, input.value);
-          }
-        });
-      })(FIELDS[i]);
+        return DEFAULT_ENDPOINT;
     }
-  }
 
-  function init() {
-    var form = document.getElementById("contact-form");
-    if (!form) return;
-    bindLiveValidation(form);
-    form.addEventListener("submit", onSubmit);
-  }
+    function $(scope, selector) {
+        return scope.querySelector(selector);
+    }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
+    function $$(scope, selector) {
+        return Array.prototype.slice.call(scope.querySelectorAll(selector));
+    }
+
+    function setError(form, fieldName, message) {
+        var errorEl = form.querySelector('[data-error-for="' + fieldName + '"]');
+        var fieldEl = form.querySelector('[name="' + fieldName + '"]');
+        if (errorEl) {
+            if (message) {
+                errorEl.textContent = message;
+                errorEl.hidden = false;
+            } else {
+                errorEl.textContent = "";
+                errorEl.hidden = true;
+            }
+        }
+        if (fieldEl) {
+            if (message) {
+                fieldEl.setAttribute("aria-invalid", "true");
+            } else {
+                fieldEl.removeAttribute("aria-invalid");
+            }
+        }
+    }
+
+    function clearAllErrors(form) {
+        $$form_errors(form).forEach(function (el) {
+            el.textContent = "";
+            el.hidden = true;
+        });
+        $$form_inputs(form).forEach(function (el) {
+            el.removeAttribute("aria-invalid");
+        });
+    }
+
+    function $$form_errors(form) {
+        return $$(form, ".contact-form__error");
+    }
+
+    function $$form_inputs(form) {
+        return $$(form, ".contact-form__input, .contact-form__consent input[type='checkbox']");
+    }
+
+    // RFC 5322-lite — practical client-side email check.
+    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    function validate(form) {
+        var data = {
+            name: (form.elements["name"].value || "").trim(),
+            email: (form.elements["email"].value || "").trim(),
+            message: (form.elements["message"].value || "").trim(),
+            consent: !!form.elements["consent"] && form.elements["consent"].checked,
+        };
+
+        var ok = true;
+
+        if (data.name.length < 2) {
+            setError(form, "name", "Please enter your name (at least 2 characters).");
+            ok = false;
+        } else if (data.name.length > 120) {
+            setError(form, "name", "Name must be 120 characters or fewer.");
+            ok = false;
+        } else {
+            setError(form, "name", "");
+        }
+
+        if (data.email.length === 0) {
+            setError(form, "email", "Please enter your work email.");
+            ok = false;
+        } else if (data.email.length > 254 || !EMAIL_RE.test(data.email)) {
+            setError(form, "email", "Please enter a valid email address.");
+            ok = false;
+        } else {
+            setError(form, "email", "");
+        }
+
+        if (data.message.length < 10) {
+            setError(form, "message", "Message should be at least 10 characters so we can help.");
+            ok = false;
+        } else if (data.message.length > 4000) {
+            setError(form, "message", "Message must be 4000 characters or fewer.");
+            ok = false;
+        } else {
+            setError(form, "message", "");
+        }
+
+        if (!data.consent) {
+            setError(form, "consent", "Please confirm you agree to be contacted.");
+            ok = false;
+        } else {
+            setError(form, "consent", "");
+        }
+
+        return ok ? data : null;
+    }
+
+    function setStatus(form, kind, message) {
+        var statusEl = $(form, "#contact-form-status");
+        if (!statusEl) return;
+        statusEl.classList.remove("contact-form__status--success", "contact-form__status--error");
+        if (!kind) {
+            statusEl.hidden = true;
+            statusEl.textContent = "";
+            return;
+        }
+        statusEl.classList.add("contact-form__status--" + kind);
+        statusEl.textContent = message;
+        statusEl.hidden = false;
+    }
+
+    function setBusy(form, busy) {
+        var submit = $(form, "#contact-submit");
+        if (!submit) return;
+        if (busy) {
+            submit.setAttribute("aria-busy", "true");
+            submit.disabled = true;
+        } else {
+            submit.removeAttribute("aria-busy");
+            submit.disabled = false;
+        }
+    }
+
+    function isThrottled() {
+        try {
+            var last = parseInt(window.localStorage.getItem(STORAGE_KEY) || "0", 10);
+            if (!last) return false;
+            return Date.now() - last < MIN_SUBMIT_INTERVAL_MS;
+        } catch (_err) {
+            return false;
+        }
+    }
+
+    function markSubmitted() {
+        try {
+            window.localStorage.setItem(STORAGE_KEY, String(Date.now()));
+        } catch (_err) {
+            /* storage may be unavailable — ignore */
+        }
+    }
+
+    function submitData(endpoint, payload) {
+        // Prefer AbortController + fetch for a clean timeout.
+        if (typeof window.fetch === "function" && typeof window.AbortController === "function") {
+            var controller = new AbortController();
+            var timer = window.setTimeout(function () {
+                controller.abort();
+            }, SUBMIT_TIMEOUT_MS);
+
+            return window
+                .fetch(endpoint, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", Accept: "application/json" },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal,
+                })
+                .then(function (response) {
+                    window.clearTimeout(timer);
+                    return response;
+                })
+                .catch(function (err) {
+                    window.clearTimeout(timer);
+                    throw err;
+                });
+        }
+
+        // Fallback: XMLHttpRequest (no timeout, but widely supported).
+        return new Promise(function (resolve, reject) {
+            try {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", endpoint, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.setRequestHeader("Accept", "application/json");
+                xhr.onload = function () {
+                    // Build a minimal response-like object.
+                    resolve({
+                        ok: xhr.status >= 200 && xhr.status < 300,
+                        status: xhr.status,
+                        json: function () {
+                            try {
+                                return Promise.resolve(JSON.parse(xhr.responseText));
+                            } catch (_e) {
+                                return Promise.resolve({});
+                            }
+                        },
+                    });
+                };
+                xhr.onerror = function () {
+                    reject(new Error("Network error"));
+                };
+                xhr.send(JSON.stringify(payload));
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    function attachLiveClear(form) {
+        // Clear a field's error as the user fixes it.
+        $$form_inputs(form).forEach(function (el) {
+            var eventName = el.type === "checkbox" || el.type === "radio" ? "change" : "input";
+            el.addEventListener(eventName, function () {
+                var name = el.getAttribute("name");
+                if (!name) return;
+                var errorEl = form.querySelector('[data-error-for="' + name + '"]');
+                if (errorEl && !errorEl.hidden) {
+                    setError(form, name, "");
+                }
+            });
+        });
+    }
+
+    function init() {
+        var form = document.getElementById("contact-form");
+        if (!form) return;
+
+        // Mark novalidate=handled: we'll do our own validation.
+        form.setAttribute("novalidate", "novalidate");
+
+        attachLiveClear(form);
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            clearAllErrors(form);
+            setStatus(form, null);
+
+            var data = validate(form);
+            if (!data) {
+                // Focus the first invalid field for accessibility.
+                var firstInvalid = form.querySelector("[aria-invalid='true']");
+                if (firstInvalid && typeof firstInvalid.focus === "function") {
+                    firstInvalid.focus();
+                }
+                return;
+            }
+
+            if (isThrottled()) {
+                setStatus(
+                    form,
+                    "error",
+                    "You just sent a message — please wait a few seconds before trying again."
+                );
+                return;
+            }
+
+            var endpoint = getEndpoint(form);
+            var submitter = form.elements["name"];
+
+            setBusy(form, true);
+
+            submitData(endpoint, data)
+                .then(function (response) {
+                    if (response && typeof response.ok === "boolean" && response.ok) {
+                        markSubmitted();
+                        form.reset();
+                        setStatus(
+                            form,
+                            "success",
+                            "Thanks — your message is on its way. We'll be in touch within one business day."
+                        );
+                        if (submitter && typeof submitter.focus === "function") {
+                            submitter.focus();
+                        }
+                        return;
+                    }
+
+                    // Try to surface server-provided error message.
+                    var fallback = "We couldn't send your message right now. Please try again in a moment.";
+                    if (response && typeof response.json === "function") {
+                        return response.json().then(function (body) {
+                            var msg = (body && (body.message || body.error)) || fallback;
+                            throw new Error(msg);
+                        });
+                    }
+                    throw new Error(fallback);
+                })
+                .catch(function (err) {
+                    var msg =
+                        err && err.name === "AbortError"
+                            ? "The request timed out. Please check your connection and try again."
+                            : (err && err.message) ||
+                              "We couldn't send your message right now. Please try again in a moment.";
+                    setStatus(form, "error", msg);
+                })
+                .then(function () {
+                    setBusy(form, false);
+                });
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
 })();
