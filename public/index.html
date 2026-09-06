@@ -7,15 +7,14 @@
   <title>Lumen — Illuminate Your Workflow</title>
   
   <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="../styles/base.css">
-  <link rel="stylesheet" href="../styles/hero.css">
-  <link rel="stylesheet" href="../styles/features.css">
-  <link rel="stylesheet" href="../styles/contact.css">
-  <link rel="stylesheet" href="../styles/folders.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/hero.css">
+  <link rel="stylesheet" href="styles/features.css">
+  <link rel="stylesheet" href="styles/contact.css">
 </head>
 <body>
   <!-- Hero Section -->
@@ -26,7 +25,36 @@
         <p class="hero__subtitle">Lumen transforms how teams collaborate. Intelligent automation meets intuitive design to help you ship faster, reduce friction, and focus on what matters.</p>
         <div class="hero__actions">
           <a href="#contact" class="btn btn--primary">Get Started Free</a>
-          <a href="#features" class="btn btn--secondary">See How It Works</a>
+          <a href="#features" class="btn btn--secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polygon points="10,8 16,12 10,16"/>
+            </svg>
+            Watch Demo
+          </a>
+        </div>
+      </div>
+      <div class="hero__visual">
+        <div class="hero__dashboard">
+          <div class="dashboard__header">
+            <div class="dashboard__dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="dashboard__title">Lumen Dashboard</span>
+          </div>
+          <div class="dashboard__content">
+            <div class="dashboard__metric">
+              <span class="metric__value">94%</span>
+              <span class="metric__label">Task Completion</span>
+            </div>
+            <div class="dashboard__chart">
+              <div class="chart__bar" style="--height: 60%"></div>
+              <div class="chart__bar" style="--height: 80%"></div>
+              <div class="chart__bar" style="--height: 45%"></div>
+              <div class="chart__bar" style="--height: 90%"></div>
+              <div class="chart__bar" style="--height: 70%"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -34,64 +62,64 @@
 
   <!-- Features Section -->
   <section id="features" class="features">
-    <div class="container">
+    <div class="container features__inner">
       <header class="features__header">
-        <h2 class="features__title">Everything you need to move faster</h2>
-        <p class="features__lede">Powerful features that streamline your workflow, eliminate repetitive tasks, and give your team the clarity to focus on shipping great products.</p>
+        <h2 class="features__title">Everything you need to ship faster</h2>
+        <p class="features__subtitle">Powerful features designed to streamline your workflow and boost productivity.</p>
       </header>
-
       <ul class="features__grid">
         <li class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+          <div class="feature-card__icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
           </div>
           <h3 class="feature-card__title">Lightning Fast</h3>
-          <p class="feature-card__desc">Sub-100ms response times with our optimized processing pipeline. Built on edge infrastructure for global low-latency access.</p>
+          <p class="feature-card__desc">Optimized performance that keeps up with your ideas. Sub-100ms response times for seamless real-time collaboration.</p>
         </li>
         <li class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+          <div class="feature-card__icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
           </div>
           <h3 class="feature-card__title">Enterprise Security</h3>
-          <p class="feature-card__desc">SOC 2 Type II certified with end-to-end encryption, SSO integration, and granular permission controls built in from day one.</p>
+          <p class="feature-card__desc">SOC 2 Type II certified. End-to-end encryption, SSO integration, and granular access controls protect your data.</p>
         </li>
         <li class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-          </div>
-          <h3 class="feature-card__title">Global Scale</h3>
-          <p class="feature-card__desc">Deploy across 40+ regions instantly. Auto-scaling infrastructure handles traffic spikes without manual intervention.</p>
-        </li>
-        <li class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
-          </div>
-          <h3 class="feature-card__title">Smart Automation</h3>
-          <p class="feature-card__desc">Build complex workflows with our visual builder. Connect 200+ integrations and automate repetitive tasks in minutes.</p>
-        </li>
-        <li class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+          <div class="feature-card__icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
           </div>
           <h3 class="feature-card__title">Team Collaboration</h3>
-          <p class="feature-card__desc">Real-time editing, inline comments, and shared workspaces keep everyone aligned. Version history lets you track every change.</p>
+          <p class="feature-card__desc">Real-time editing, comments, and version history. Keep everyone aligned whether they're in the office or remote.</p>
         </li>
         <li class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+          <div class="feature-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <h3 class="feature-card__title">AI-Powered Insights</h3>
+          <p class="feature-card__desc">Smart recommendations and automated workflows that learn from your patterns to surface insights and save time.</p>
+        </li>
+        <li class="feature-card">
+          <div class="feature-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <h3 class="feature-card__title">Real-time Analytics</h3>
+          <p class="feature-card__desc">Live dashboards and custom reports that give you visibility into what's working and where to focus next.</p>
+        </li>
+        <li class="feature-card">
+          <div class="feature-card__icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
@@ -116,33 +144,47 @@
       <form id="contact-form" class="contact__form" action="/api/contact" method="POST" novalidate>
         <div class="form-group">
           <label for="name">Full Name</label>
-          <input type="text" id="name" name="name" placeholder="Jane Smith" autocomplete="name" required>
-          <span class="form-error" aria-live="polite"></span>
+          <input type="text" id="name" name="name" placeholder="Jane Smith" required autocomplete="name" aria-describedby="name-error">
+          <span id="name-error" class="form-error" role="alert" aria-live="polite"></span>
         </div>
         
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="jane@company.com" autocomplete="email" required>
-          <span class="form-error" aria-live="polite"></span>
+          <input type="email" id="email" name="email" placeholder="jane@company.com" required autocomplete="email" aria-describedby="email-error">
+          <span id="email-error" class="form-error" role="alert" aria-live="polite"></span>
         </div>
         
         <div class="form-group">
           <label for="message">Message</label>
-          <textarea id="message" name="message" rows="5" placeholder="Tell us about your project or question..." required></textarea>
-          <span class="form-error" aria-live="polite"></span>
+          <textarea id="message" name="message" rows="5" placeholder="Tell us about your project, team size, and what you're hoping to achieve with Lumen..." required aria-describedby="message-error"></textarea>
+          <span id="message-error" class="form-error" role="alert" aria-live="polite"></span>
         </div>
         
         <div class="form-actions">
-          <button type="submit" class="btn btn--primary btn--lg">Send Message</button>
+          <button type="submit" class="btn btn--primary btn--submit">
+            <span class="btn__text">Send Message</span>
+            <span class="btn__loader" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="60">
+                  <animate attributeName="stroke-dashoffset" dur="1s" values="60;0" repeatCount="indefinite"/>
+                </circle>
+              </svg>
+            </span>
+          </button>
         </div>
         
-        <div id="form-status" class="form-status" aria-live="polite"></div>
+        <div id="form-success" class="form-success" role="status" aria-live="polite" hidden>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <p>Thanks for reaching out! We'll get back to you within 24 hours.</p>
+        </div>
       </form>
     </div>
   </section>
 
   <!-- Scripts -->
-  <script src="../scripts/main.js" defer></script>
-  <script src="../scripts/contact.js" defer></script>
+  <script src="scripts/contact.js"></script>
 </body>
 </html>
