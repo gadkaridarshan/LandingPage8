@@ -1,213 +1,238 @@
-<!-- helix: public/index.html -->
-<!-- @helix:story USER-841000 -->
+<!-- helix: public/index.html @helix:story USER-988000 -->
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Lumen — a modern SaaS platform that helps teams ship faster with confidence. Learn more and get in touch." />
-    <title>Lumen — Ship faster, with confidence</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta name="description" content="Lumen is the modern SaaS platform that turns scattered work into clear, actionable flow — for teams who ship." />
+    <title>Lumen — Turn scattered work into clear flow</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles/base.css" />
+    <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/styles/hero.css" />
     <link rel="stylesheet" href="/styles/features.css" />
     <link rel="stylesheet" href="/styles/contact.css" />
-  </head>
-  <body>
+</head>
+<body>
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <header class="site-header">
-      <div class="container site-header__inner">
-        <a class="brand" href="#top" aria-label="Lumen home">
-          <span class="brand__mark" aria-hidden="true"></span>
-          <span class="brand__name">Lumen</span>
-        </a>
-        <nav class="site-nav" aria-label="Primary">
-          <a href="#features">Features</a>
-          <a href="#contact">Contact</a>
-          <a class="site-nav__cta" href="#contact">Get started</a>
-        </nav>
-      </div>
+    <header class="site-header" role="banner">
+        <div class="container site-header__inner">
+            <a class="site-header__brand" href="#main" aria-label="Lumen home">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span class="brand-name">Lumen</span>
+            </a>
+            <nav class="site-nav" aria-label="Primary">
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+                <a class="site-nav__cta" href="#contact">Get started</a>
+            </nav>
+        </div>
     </header>
 
-    <main id="main">
-      <section class="hero" id="top">
-        <div class="container hero__grid">
-          <div class="hero__copy">
-            <p class="eyebrow">New · Version 3.0 is here</p>
-            <h1 class="hero__title">
-              Ship faster, <span class="hero__title-accent">with confidence.</span>
-            </h1>
-            <p class="hero__lede">
-              Lumen is the modern SaaS platform that turns scattered work into a single,
-              calm workflow — so your team can focus on the work that actually moves
-              the needle.
-            </p>
-            <div class="hero__actions">
-              <a class="btn btn--primary" href="#contact">Request a demo</a>
-              <a class="btn btn--ghost" href="#features">Explore features</a>
+    <main id="main" tabindex="-1">
+        <!-- Hero -->
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero__grid">
+                <div class="hero__copy">
+                    <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span>New · Flow Engine 2.0</p>
+                    <h1 id="hero-title" class="hero__title">
+                        Turn scattered work into
+                        <span class="hero__title-accent">clear flow</span>
+                    </h1>
+                    <p class="hero__lede">
+                        Lumen is the modern SaaS platform that helps product teams capture every idea,
+                        prioritize what matters, and ship with confidence — without the chaos of scattered tools.
+                    </p>
+                    <div class="hero__actions">
+                        <a class="btn btn--primary" href="#contact">Start free trial</a>
+                        <a class="btn btn--ghost" href="#features">See features</a>
+                    </div>
+                    <ul class="hero__bullets" aria-label="Highlights">
+                        <li><span aria-hidden="true">✓</span> No credit card required</li>
+                        <li><span aria-hidden="true">✓</span> SOC 2 ready</li>
+                        <li><span aria-hidden="true">✓</span> Cancel anytime</li>
+                    </ul>
+                </div>
+
+                <aside class="hero__visual" aria-hidden="true">
+                    <div class="hero-card">
+                        <header class="hero-card__head">
+                            <span class="hero-card__dot hero-card__dot--r"></span>
+                            <span class="hero-card__dot hero-card__dot--y"></span>
+                            <span class="hero-card__dot hero-card__dot--g"></span>
+                            <span class="hero-card__title">Sprint 24 — Q4 Goals</span>
+                        </header>
+                        <ul class="hero-card__list">
+                            <li><span class="tag tag--accent">Backlog</span> Audit onboarding flow</li>
+                            <li><span class="tag tag--primary">In&nbsp;progress</span> Ship Flow Engine 2.0</li>
+                            <li><span class="tag tag--muted">Done</span> Migrate workspace data</li>
+                            <li><span class="tag tag--accent">Backlog</span> Customer interview notes</li>
+                        </ul>
+                        <div class="hero-card__stat">
+                            <div class="stat">
+                                <span class="stat__num">87%</span>
+                                <span class="stat__label">Tasks shipped on time</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat__num">3.4×</span>
+                                <span class="stat__label">Faster planning</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero__halo" aria-hidden="true"></div>
+                </aside>
             </div>
-            <ul class="hero__trust" aria-label="Trusted by">
-              <li>Trusted by 2,400+ teams</li>
-              <li>SOC 2 Type II</li>
-              <li>99.99% uptime</li>
-            </ul>
-          </div>
-          <div class="hero__visual" aria-hidden="true">
-            <div class="hero__panel">
-              <div class="hero__panel-bar">
-                <span></span><span></span><span></span>
-              </div>
-              <div class="hero__panel-body">
-                <div class="hero__stat">
-                  <span class="hero__stat-label">Active projects</span>
-                  <span class="hero__stat-value">128</span>
-                </div>
-                <div class="hero__stat">
-                  <span class="hero__stat-label">Deploys today</span>
-                  <span class="hero__stat-value">42</span>
-                </div>
-                <div class="hero__stat hero__stat--accent">
-                  <span class="hero__stat-label">Health</span>
-                  <span class="hero__stat-value">99.99%</span>
-                </div>
-              </div>
+        </section>
+
+        <!-- Features -->
+        <section id="features" class="features" aria-labelledby="features-title">
+            <div class="container">
+                <header class="features__header">
+                    <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span>Why Lumen</p>
+                    <h2 id="features-title" class="features__title">Everything your team needs to ship, in one place</h2>
+                    <p class="features__lede">
+                        A focused toolkit that replaces half a dozen apps. Capture ideas, plan sprints, and keep your team aligned —
+                        without the friction of switching between tools.
+                    </p>
+                </header>
+
+                <ul class="features__grid" role="list">
+                    <li class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        </div>
+                        <h3 class="feature-card__title">Flow Engine</h3>
+                        <p class="feature-card__body">
+                            Automatically turn scattered requests, tickets, and notes into a prioritized backlog your team can actually action.
+                        </p>
+                    </li>
+                    <li class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+                        </div>
+                        <h3 class="feature-card__title">Realtime insights</h3>
+                        <p class="feature-card__body">
+                            Live dashboards show throughput, blockers, and risk — so leadership stops asking for status updates.
+                        </p>
+                    </li>
+                    <li class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7L9 18l-5-5"/></svg>
+                        </div>
+                        <h3 class="feature-card__title">Ship with confidence</h3>
+                        <p class="feature-card__body">
+                            Built-in release checklists, approvals, and rollback notes keep every deploy accountable and traceable.
+                        </p>
+                    </li>
+                </ul>
             </div>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="features" id="features" aria-labelledby="features-title">
-        <div class="container">
-          <header class="features__header">
-            <p class="eyebrow">Capabilities</p>
-            <h2 id="features-title" class="features__title">
-              Everything you need, nothing you don't.
-            </h2>
-            <p class="features__lede">
-              Lumen is built around a small, opinionated set of capabilities that
-              cover the full lifecycle of modern product work — from planning and
-              shipping to measuring what matters.
-            </p>
-          </header>
+        <!-- Contact -->
+        <section id="contact" class="contact" aria-labelledby="contact-title">
+            <div class="container contact__grid">
+                <div class="contact__intro">
+                    <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span>Get in touch</p>
+                    <h2 id="contact-title" class="contact__title">Tell us what you're building</h2>
+                    <p class="contact__lede">
+                        Have a question, an idea, or a team to onboard? Send us a note and a real human on our team will get back to you
+                        within one business day.
+                    </p>
+                    <ul class="contact__bullets" role="list">
+                        <li><strong>Email</strong><span>hello@lumen.example</span></li>
+                        <li><strong>Sales</strong><span>Mon–Fri, 9am–6pm PT</span></li>
+                        <li><strong>Status</strong><span><a href="#">All systems operational</a></span></li>
+                    </ul>
+                </div>
 
-          <ul class="features__grid" role="list">
-            <li class="feature-card">
-              <span class="feature-card__icon feature-card__icon--indigo" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
-                  <path d="M3 12l2-2 4 4 8-8 4 4" />
-                  <path d="M3 20h18" />
-                </svg>
-              </span>
-              <h3 class="feature-card__title">Real-time insights</h3>
-              <p class="feature-card__desc">
-                Live dashboards surface what shipped, what's blocked, and what's at risk —
-                so every team meeting starts with the same ground truth.
-              </p>
-            </li>
+                <form id="contact-form" class="contact-form" novalidate aria-describedby="contact-form-status">
+                    <div class="contact-form__row">
+                        <label class="field">
+                            <span class="field__label">Full name</span>
+                            <input
+                                class="field__input"
+                                type="text"
+                                id="contact-name"
+                                name="name"
+                                autocomplete="name"
+                                required
+                                minlength="2"
+                                maxlength="120"
+                                aria-required="true"
+                                aria-describedby="contact-name-error"
+                                placeholder="Ada Lovelace" />
+                            <span class="field__error" id="contact-name-error" role="alert" aria-live="polite"></span>
+                        </label>
 
-            <li class="feature-card">
-              <span class="feature-card__icon feature-card__icon--violet" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
-                  <rect x="3" y="4" width="18" height="16" rx="2" />
-                  <path d="M3 9h18" />
-                  <path d="M8 2v4" />
-                  <path d="M16 2v4" />
-                </svg>
-              </span>
-              <h3 class="feature-card__title">Unified planning</h3>
-              <p class="feature-card__desc">
-                Roadmaps, sprints, and backlogs live in one calm view. Replace six tools
-                with one workspace your team actually enjoys opening.
-              </p>
-            </li>
+                        <label class="field">
+                            <span class="field__label">Work email</span>
+                            <input
+                                class="field__input"
+                                type="email"
+                                id="contact-email"
+                                name="email"
+                                autocomplete="email"
+                                required
+                                maxlength="254"
+                                aria-required="true"
+                                aria-describedby="contact-email-error"
+                                placeholder="ada@yourcompany.com" />
+                            <span class="field__error" id="contact-email-error" role="alert" aria-live="polite"></span>
+                        </label>
+                    </div>
 
-            <li class="feature-card">
-              <span class="feature-card__icon feature-card__icon--emerald" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
-                  <path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z" />
-                </svg>
-              </span>
-              <h3 class="feature-card__title">Built-in automation</h3>
-              <p class="feature-card__desc">
-                Trigger deploys, handoffs, and notifications from any event. No glue
-                scripts — just rules that read like English.
-              </p>
-            </li>
+                    <label class="field">
+                        <span class="field__label">Your message</span>
+                        <textarea
+                            class="field__input field__input--textarea"
+                            id="contact-message"
+                            name="message"
+                            required
+                            minlength="10"
+                            maxlength="4000"
+                            rows="5"
+                            aria-required="true"
+                            aria-describedby="contact-message-error"
+                            placeholder="Tell us a bit about your team and what you'd like to learn…"></textarea>
+                        <span class="field__error" id="contact-message-error" role="alert" aria-live="polite"></span>
+                    </label>
 
-            <li class="feature-card">
-              <span class="feature-card__icon feature-card__icon--amber" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
-                  <path d="M12 2a10 10 0 1 0 10 10" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-              </span>
-              <h3 class="feature-card__title">Time-aware reporting</h3>
-              <p class="feature-card__desc">
-                See cycle time, scope changes, and outcomes as they evolve. Spot
-                regressions the week they happen, not the quarter after.
-              </p>
-            </li>
+                    <div class="contact-form__footer">
+                        <p class="contact-form__legal">
+                            By submitting, you agree to our <a href="#">privacy policy</a>. We'll never share your details.
+                        </p>
+                        <button type="submit" class="btn btn--primary contact-form__submit">
+                            <span class="contact-form__submit-label">Send message</span>
+                            <span class="contact-form__spinner" aria-hidden="true"></span>
+                        </button>
+                    </div>
 
-            <li class="feature-card">
-              <span class="feature-card__icon feature-card__icon--sky" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
-                  <path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z" />
-                  <path d="M9 12l2 2 4-4" />
-                </svg>
-              </span>
-              <h3 class="feature-card__title">Enterprise-grade security</h3>
-              <p class="feature-card__desc">
-                SOC 2 Type II, SSO, granular roles, and full audit logs out of the
-                box — so procurement stops being the bottleneck.
-              </p>
-            </li>
-
-            <li class="feature-card">
-              <span class="feature-card__icon feature-card__icon--rose" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-              </span>
-              <h3 class="feature-card__title">Calm collaboration</h3>
-              <p class="feature-card__desc">
-                Threaded updates, @mentions, and quiet-by-default notifications that
-                respect focus time and async teammates.
-              </p>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="contact" id="contact" aria-labelledby="contact-title">
-        <div class="container contact__grid">
-          <div class="contact__copy">
-            <p class="eyebrow">Get in touch</p>
-            <h2 id="contact-title" class="contact__title">
-              Let's talk about your team.
-            </h2>
-            <p class="contact__lede">
-              Tell us a little about your workflow and we'll get back within one
-              business day with next steps — no demos, no pressure.
-            </p>
-          </div>
-          <form class="contact__form" novalidate>
-            <!-- contact form lives here -->
-          </form>
-        </div>
-      </section>
+                    <div
+                        id="contact-form-status"
+                        class="contact-form__status"
+                        role="status"
+                        aria-live="polite"
+                        hidden></div>
+                </form>
+            </div>
+        </section>
     </main>
 
-    <footer class="site-footer">
-      <div class="container site-footer__inner">
-        <span class="site-footer__brand">© Lumen</span>
-        <nav class="site-footer__nav" aria-label="Footer">
-          <a href="#features">Features</a>
-          <a href="#contact">Contact</a>
-        </nav>
-      </div>
+    <footer class="site-footer" role="contentinfo">
+        <div class="container site-footer__inner">
+            <p>© <span id="footer-year">2025</span> Lumen, Inc. All rights reserved.</p>
+            <nav class="site-footer__nav" aria-label="Footer">
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+            </nav>
+        </div>
     </footer>
-  </body>
+
+    <script src="/scripts/main.js" defer></script>
+    <script src="/scripts/contact.js" defer></script>
+</body>
 </html>

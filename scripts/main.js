@@ -1,33 +1,31 @@
 /* helix: scripts/main.js */
-/* Lightweight progressive enhancements for the Lumen landing page. */
-
 (function () {
-    "use strict";
+    'use strict';
 
-    function initFooterYear() {
-        var yearEl = document.getElementById("footer-year");
-        if (!yearEl) return;
-        var now = new Date();
-        var year = now.getFullYear();
-        // If the markup already has a sensible static year, only override when it
-        // looks like a placeholder ("2024", "2025", etc.) — keep editorial control.
-        if (!/^\d{4}$/.test(yearEl.textContent || "")) {
-            yearEl.textContent = String(year);
-            return;
+    // Footer year stamp.
+    var yearEl = document.getElementById('footer-year');
+    if (yearEl) {
+        yearEl.textContent = String(new Date().getFullYear());
+    }
+
+    // Smooth in-page anchor scrolling that respects reduced motion.
+    var prefersReduced = typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.addEventListener('click', function (event) {
+        var anchor = event.target && event.target.closest && event.target.closest('a[href^="#"]');
+        if (!anchor) { return; }
+        var href = anchor.getAttribute('href');
+        if (!href || href === '#') { return; }
+        var target = document.getElementById(href.slice(1));
+        if (!target) { return; }
+        event.preventDefault();
+        target.scrollIntoView({
+            behavior: prefersReduced ? 'auto' : 'smooth',
+            block: 'start'
+        });
+        if (typeof target.focus === 'function') {
+            try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
         }
-        var parsed = Number.parseInt(yearEl.textContent, 10);
-        if (!Number.isFinite(parsed) || parsed < 2024) {
-            yearEl.textContent = String(year);
-        }
-    }
-
-    function init() {
-        initFooterYear();
-    }
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-    } else {
-        init();
-    }
+    });
 })();
