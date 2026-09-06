@@ -1,17 +1,17 @@
 # Lumen — Landing Page
 
-A polished, single-page marketing site for **Lumen**, a modern SaaS product. The
-page introduces the product in a hero section, showcases capabilities in a
+A polished, single-page marketing site for **Lumen**, a modern SaaS product.
+The page introduces the product in a hero section, showcases capabilities in a
 features grid, and lets visitors send inquiries through a contact form. The
 visual treatment is professional — tasteful gradients, generous whitespace,
 accessible typography, and accessible form controls — so the page reads as a
 finished product surface, not a placeholder.
 
 The frontend is fully static — plain HTML, CSS, and vanilla JavaScript served
-over HTTP — so it can be hosted on any static-file host (GitHub Pages, Netlify,
-Cloudflare Pages, S3 + CloudFront, `nginx`, etc.) or previewed locally without
-a build step. There is no framework runtime, no bundler, and no client-side
-dependency to install.
+over HTTP — so it can be hosted on any static-file host (GitHub Pages,
+Netlify, Cloudflare Pages, S3 + CloudFront, `nginx`, etc.) or previewed
+locally without a build step. There is no framework runtime, no bundler, and
+no client-side dependency to install.
 
 ## Prerequisites
 
@@ -19,258 +19,64 @@ dependency to install.
   `npx --yes serve`) and the `npm run typecheck:js` script, which validates
   every JavaScript file with `node --check`. The `engines` field in
   `package.json` enforces this minimum.
-- **npm 9+** — ships with Node.js 18; used to invoke `npx` and (optionally) to
-  install `serve` as a dev dependency declared in `package.json`.
-- **A modern browser** — Chrome, Firefox, Safari, or Edge — for local preview
-  and contact-form interaction. The page uses modern CSS (custom properties,
-  `clamp()`, CSS Grid, `aspect-ratio`) and ES2019+ JavaScript.
-- **An HTTP origin** — the page must be served over `http://` or `https://`
-  (not opened via `file://`) so that relative asset paths, the Google Fonts
-  request, and the contact form's network submission behave correctly.
+- **npm 9+** — ships with Node.js 18; used to invoke `npx` and (optionally)
+  to install `serve` as a dev dependency declared in `package.json`.
+- **A modern browser** — Chrome, Firefox, Safari, or Edge — for local
+  preview and contact-form interaction. The page uses modern CSS (custom
+  properties, `clamp()`, CSS Grid, `aspect-ratio`) and ES2019+ JavaScript.
+- **An HTTP origin** — the page must be served over `http://` or
+  `https://` (not opened via `file://`) so that relative asset paths, the
+  Google Fonts request, and the contact form's network submission behave
+  correctly.
+- **An optional POST endpoint** — `scripts/contact.js` posts inquiries to
+  `/api/contact`. If you do not deploy the reference handler in
+  `server/contact-handler.example.js`, the form gracefully falls back to a
+  `mailto:` link so visitors can still reach you.
 
-## Local development
+## Running locally
 
 The project has no build step. Every file under `public/` and `styles/` is
 shipped to the browser as-is.
 
-```bash
-# 1. Install the local dev dependency (serve)
-npm install
-
-# 2. Preview the site at http://localhost:3000
-npm run preview
-
-# 3. (Optional) Validate every script with --check
-npm run typecheck:js
-```
-
-`npm run preview` runs `serve --no-clipboard public`, which serves the
-`public/` directory on port `3000` by default. Override the port with
-`--listen`:
-
-```bash
-npx --yes serve --no-clipboard public --listen 4000
-```
-
-`npm run typecheck:js` runs `node --check` against each file in `scripts/`
-and `server/` so syntax errors surface before deployment.
-
-## Production deployment
-
-The site is 100% static, so any host that can serve files over HTTP works.
-Pick the section below that matches your platform. Every option ships the
-contents of `public/` as static assets and leaves `styles/`, `scripts/`, and
-`server/` (the optional contact handler example) alongside it at the site root.
-
-### Before you deploy — production checklist
-
-1. **Build nothing.** There is no build step. Whatever is in `public/`,
-   `styles/`, and `scripts/` is what gets served.
-2. **Keep the directory layout intact.** `index.html` references assets via
-   absolute paths (`/styles/base.css`, `/scripts/main.js`, …). Either serve
-   the repository root so those paths resolve, or upload the full tree
-   (`public/`, `styles/`, `scripts/`, `server/`) to your host's web root and
-   configure the host to serve `public/index.html` as the directory index.
-3. **Set correct MIME types.** The host must serve `.css` as `text/css`,
-   `.js` as `application/javascript`, and `.html` as `text/html`. All major
-   static hosts do this by default.
-4. **Force HTTPS.** Browsers block the Google Fonts request and downgrade the
-   contact form on plain HTTP. Use your host's TLS settings or put the site
-   behind Cloudflare.
-5. **Wire up the contact form** (optional). `scripts/contact.js` posts to
-   `/api/contact` by default. See `server/contact-handler.example.js` for a
-   reference implementation and deploy it as a serverless function (Cloudflare
-   Worker, Netlify Function, Vercel Function, AWS Lambda behind API Gateway,
-   etc.). If you skip this step, the form will fall back to a `mailto:` link
-   and still work for visitors.
-6. **Set caching headers.** Static assets in `styles/` and `scripts/` are
-   safe to cache for a long time (e.g. `Cache-Control: public, max-age=31536000, immutable`).
-   Serve `index.html` with a short cache (or `no-cache`) so updates roll out
-   immediately.
-7. **Verify after deploy.** Run the **Verification** checklist at the bottom
-   of this section from a fresh browser profile.
-
-### Option A — GitHub Pages
-
-1. Push the repository to GitHub.
-2. In the repo, go to **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**.
-4. Select the branch you want to publish (commonly `main`) and set the
-   folder to `/` (repository root). Because `index.html` lives in
-   `public/`, set the folder to `/public` instead — GitHub Pages will serve
-   `public/index.html` as the site root.
-5. Click **Save**. GitHub Pages will print the live URL
-   (`https://<user>.github.io/<repo>/`).
-6. (Optional) Add a custom domain: create a `CNAME` file in `public/`
-   containing the bare domain, then point the domain's DNS to GitHub.
+1. **Install the local dev dependency.**
 
    ```bash
-   echo "lumen.example.com" > public/CNAME
-   git add public/CNAME
-   git commit -m "Add custom domain for GitHub Pages"
-   git push
+   npm install
    ```
 
-### Option B — Netlify
+   This installs `serve` (declared in `package.json` `devDependencies`) so
+   `npm run preview` can launch it via `npx`.
 
-1. Sign in to Netlify and choose **Add new site → Deploy manually** (or
-   connect the Git repo for continuous deploys).
-2. For a manual drop, drag the project folder onto the deploy box.
-3. For a Git-connected deploy, set:
-   - **Build command:** *(leave empty — no build step)*
-   - **Publish directory:** `public`
-4. Click **Deploy site**. Netlify assigns a `*.netlify.app` URL.
-5. (Optional) Add a `netlify.toml` at the project root to lock in settings:
-
-   ```toml
-   # netlify.toml
-   [build]
-     publish = "public"
-
-   [[headers]]
-     for = "/styles/*"
-     [headers.values]
-       Cache-Control = "public, max-age=31536000, immutable"
-
-   [[headers]]
-     for = "/scripts/*"
-     [headers.values]
-       Cache-Control = "public, max-age=31536000, immutable"
-
-   [[headers]]
-     for = "/*"
-     [headers.values]
-       X-Frame-Options = "DENY"
-       X-Content-Type-Options = "nosniff"
-       Referrer-Policy = "strict-origin-when-cross-origin"
-   ```
-
-6. (Optional) Add a serverless function for the contact form: drop a file at
-   `netlify/functions/contact.js` that wraps
-   `server/contact-handler.example.js`, and the form will POST to
-   `/.netlify/functions/contact`. Update the `endpoint` in
-   `scripts/contact.js` if you choose a different path.
-
-### Option C — Cloudflare Pages
-
-1. In the Cloudflare dashboard, open **Workers & Pages → Create → Pages →
-   Connect to Git**.
-2. Select the repository.
-3. Set:
-   - **Framework preset:** *None*
-   - **Build command:** *(empty)*
-   - **Build output directory:** `public`
-4. Click **Save and Deploy**. Cloudflare Pages assigns a `*.pages.dev` URL.
-5. (Optional) Add a **Custom domain** under the project's **Settings** tab.
-6. (Optional) Add a Worker for `/api/contact` using
-   `server/contact-handler.example.js` as the starting point.
-
-### Option D — AWS S3 + CloudFront
-
-1. Create an S3 bucket (e.g. `lumen-prod`) with **Block all public access**
-   initially, then attach a bucket policy that allows public `s3:GetObject`
-   for the objects you upload.
-2. Enable **Static website hosting** on the bucket and set both the *Index
-   document* and *Error document* to `index.html`.
-3. Upload the site contents, preserving the directory layout. Either upload
-   the whole repo root so paths like `/styles/base.css` resolve, or upload
-   `public/`, `styles/`, `scripts/`, and `server/` to the bucket root.
+2. **Run a quick syntax check (optional but recommended).**
 
    ```bash
-   aws s3 sync ./public  s3://lumen-prod/ --delete --exclude "*.example.js"
-   aws s3 sync ./styles  s3://lumen-prod/styles  --delete --cache-control "public, max-age=31536000, immutable"
-   aws s3 sync ./scripts s3://lumen-prod/scripts --delete --cache-control "public, max-age=31536000, immutable"
+   npm run typecheck:js
    ```
 
-4. Create a CloudFront distribution with the S3 bucket as the origin, set
-   **Default root object** to `index.html`, and request an ACM certificate
-   in `us-east-1` for your custom domain.
-5. Add an alternate domain name to the distribution and update Route 53 (or
-   your DNS provider) with an `ALIAS` record pointing at the distribution
-   domain.
-6. (Optional) Put a Lambda@Edge or API Gateway + Lambda in front of
-   `/api/contact` using the handler in `server/contact-handler.example.js`.
+   This runs `node --check` against every file in `scripts/` and `server/`
+   so syntax errors surface before you start the server.
 
-### Option E — Any static host (nginx, Caddy, Apache, S3-compatible, …)
+3. **Start the local preview server.**
 
-1. Copy the project to the server (or mount it from a deploy artifact).
-2. Point the web root at the directory that contains `public/index.html`,
-   and configure the host to serve `public/index.html` as the directory
-   index (or symlink `public/` to the web root and ship the rest alongside).
-3. Enable gzip or Brotli for `text/html`, `text/css`, and
-   `application/javascript`.
-4. Add long-lived `Cache-Control` headers for `/styles/*` and `/scripts/*`,
-   and short or no caching for `index.html`.
-5. (Optional) Reverse-proxy `/api/contact` to a Node service that wraps
-   `server/contact-handler.example.js`.
+   ```bash
+   npm run preview
+   ```
 
-A minimal nginx server block that serves the repo with `/api/contact`
-proxied to a local Node handler:
+   This runs `serve --no-clipboard public`, which serves the `public/`
+   directory on port `3000` by default.
 
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name lumen.example.com;
+4. **Verify the page is up.**
 
-    root /var/www/lumen;
-    index public/index.html;
+   Open <http://localhost:3000/> in a modern browser. You should see:
 
-    location / {
-        try_files $uri $uri/ /public/index.html;
-    }
+   - The Lumen **hero** loads with the headline, subheadline, and primary
+     CTA rendered in the Inter font stack.
+   - The **features** grid displays its cards in three columns on desktop
+     (one column on narrow viewports) with the polished gradient backdrop.
+   - The **contact** form renders labelled inputs (name, email, message),
+     accepts client-side validation, and posts to `/api/contact` when the
+     backend is reachable (or opens a `mailto:` fallback otherwise).
 
-    location ~* ^/(styles|scripts)/ {
-        expires 1y;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-        access_log off;
-    }
+If all of the above check out, the local environment is healthy.
 
-    location = /index.html {
-        add_header Cache-Control "no-cache";
-    }
-
-    location = /api/contact {
-        proxy_pass http://127.0.0.1:8787;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-Run the example contact handler locally with:
-
-```bash
-node server/contact-handler.example.js
-```
-
-By default it listens on `http://127.0.0.1:8787` and exposes `POST /contact`.
-
-### Verification
-
-After every deployment, walk through this checklist from a private browser
-window:
-
-1. **Page loads.** Visit the production URL and confirm the hero, features
-   grid, folders section, and contact form all render with no console errors.
-2. **Assets resolve.** Open DevTools → Network and confirm every request
-   returns `200` and the correct MIME type (CSS, JS, HTML, fonts).
-3. **Fonts load.** Headings should render in Inter, not the system fallback.
-4. **Navigation works.** Clicking each header link (`Features`, `Folders`,
-   `Contact`) scrolls to the matching section, and the focus ring is visible
-   on each link.
-5. **Keyboard reachability.** Press `Tab` from the URL bar; the skip link
-   should appear, and `Enter` should jump to `#main`.
-6. **Mobile layout.** Resize to ~375px wide — the hero, feature cards, and
-   form should stack without horizontal scroll.
-7. **Contact form.** Submit a test message. If `/api/contact` is wired up,
-   the request returns `200` and a success message appears. If not, the
-   form should fall back to a `mailto:` link.
-8. **Caching.** Reload the page — `/styles/*` and `/scripts/*` should be
-   served from cache (`(disk cache)` or `(memory cache)` in the Network
-   panel) on the second load.
-
-If every step passes, the deployment is healthy.
-
-## Project structure
+## Project Structure

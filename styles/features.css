@@ -56,85 +56,59 @@
   padding: 1.75rem;
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  border-radius: 12px;
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .feature-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 12px 32px -12px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.12);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .feature-card__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: var(--radius-md);
-  margin-bottom: 1.25rem;
-  color: #ffffff;
-}
-
-.feature-card__icon svg {
-  width: 1.5rem;
-  height: 1.5rem;
-  display: block;
-}
-
-.feature-card__icon--indigo {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-}
-
-.feature-card__icon--violet {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-}
-
-.feature-card__icon--emerald {
-  background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.feature-card__icon--amber {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-}
-
-.feature-card__icon--sky {
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
-}
-
-.feature-card__icon--rose {
-  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-radius: 10px;
+  color: #6366f1;
 }
 
 .feature-card__title {
   font-size: 1.125rem;
   font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  margin: 0 0 0.5rem;
   color: var(--color-text);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
 }
 
-.feature-card__desc {
+.feature-card__description {
   font-size: 0.9375rem;
   color: var(--color-text-muted);
-  line-height: 1.6;
   margin: 0;
+  line-height: 1.6;
 }
 
-@media (max-width: 960px) {
+/* Responsive: tablet */
+@media (max-width: 1024px) {
   .features__grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* Responsive: mobile */
 @media (max-width: 640px) {
   .features__grid {
     grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    padding: 1.5rem;
   }
 
   .features__header {

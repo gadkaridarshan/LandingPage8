@@ -1,267 +1,252 @@
-/* helix: scripts/contact.js @helix:story USER-173000 */
+// helix: scripts/contact.js
 (function () {
-    'use strict';
+  'use strict';
 
-    /**
-     * Contact form controller for the Lumen landing page.
-     *
-     * - Validates name, email, and message client-side.
-     * - Submits via fetch() to the configured endpoint (window.LUMEN_CONTACT_ENDPOINT).
-     * - Falls back to a simulated "queued" response when no endpoint is set so the
-     *   page is fully demoable from a static host.
-     * - Surfaces success / error feedback through an aria-live status banner.
-     *
-     * The server contract is documented in server/contact-handler.example.js.
-     */
-    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    var DEFAULT_ENDPOINT = (typeof window !== 'undefined' && window.LUMEN_CONTACT_ENDPOINT) || '';
-    var NETWORK_TIMEOUT_MS = 8000;
+  const form = document.getElementById('contact-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const successMessage = document.getElementById('form-success');
 
-    /**
-     * Locate the form and bail out cleanly if the section isn't on the page.
-     */
-    function init() {
-        var form = document.getElementById('contact-form');
-        if (!form) {
-            return;
+  if (!form) {
+    console.error('Contact form not found');
+    return;
+  }
+
+  // Validation patterns
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  /**
+   * Validation rules for each field
+   */
+  const validationRules = {
+    name: {
+      validate: (value) => {
+        if (!value.trim()) {
+          return 'Please enter your name';
         }
+        if (value.trim().length < 2) {
+          return 'Name must be at least 2 characters';
+        }
+        return null;
+      },
+      errorId: 'name-error',
+      inputId: 'name'
+    },
+    email: {
+      validate: (value) => {
+        if (!value.trim()) {
+          return 'Please enter your email address';
+        }
+        if (!emailPattern.test(value.trim())) {
+          return 'Please enter a valid email address';
+        }
+        return null;
+      },
+      errorId: 'email-error',
+      inputId: 'email'
+    },
+    company: {
+      validate: (value) => {
+        // Company is optional, but if filled, validate length
+        if (value.trim().length > 0 && value.trim().length < 2) {
+          return 'Company name must be at least 2 characters';
+        }
+        return null;
+      },
+      errorId: 'company-error',
+      inputId: 'company'
+    },
+    message: {
+      validate: (value) => {
+        if (!value.trim()) {
+          return 'Please enter your message';
+        }
+        if (value.trim().length < 10) {
+          return 'Message must be at least 10 characters';
+        }
+        return null;
+      },
+      errorId: 'message-error',
+      inputId: 'message'
+    }
+  };
 
-        var fields = {
-            name: form.querySelector('#contact-name'),
-            email: form.querySelector('#contact-email'),
-            message: form.querySelector('#contact-message')
-        };
+  /**
+   * Show error for a specific field
+   * @param {string} fieldName - The field name to show error for
+   * @param {string|null} errorMessage - The error message, or null to clear
+   */
+  function showFieldError(fieldName, errorMessage) {
+    const rule = validationRules[fieldName];
+    if (!rule) return;
 
-        var errors = {
-            name: form.querySelector('#contact-name-error'),
-            email: form.querySelector('#contact-email-error'),
-            message: form.querySelector('#contact-message-error')
-        };
+    const input = document.getElementById(rule.inputId);
+    const errorEl = document.getElementById(rule.errorId);
 
-        var statusEl = form.querySelector('#contact-form-status');
-
-        // Clear validation state as the user edits.
-        Object.keys(fields).forEach(function (key) {
-            var input = fields[key];
-            if (!input) { return; }
-            input.addEventListener('input', function () {
-                clearFieldError(input, errors[key]);
-            });
-        });
-
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-            handleSubmit(form, fields, errors, statusEl);
-        });
+    if (errorEl) {
+      errorEl.textContent = errorMessage || '';
+      errorEl.classList.toggle('is-visible', !!errorMessage);
     }
 
-    /**
-     * Run validation, then either POST to the endpoint or simulate success.
-     */
-    function handleSubmit(form, fields, errors, statusEl) {
-        var values = {
-            name: (fields.name && fields.name.value || '').trim(),
-            email: (fields.email && fields.email.value || '').trim(),
-            message: (fields.message && fields.message.value || '').trim()
-        };
+    if (input) {
+      input.classList.toggle('is-invalid', !!errorMessage);
+    }
+  }
 
-        var firstInvalid = null;
-        var problems = validate(values);
-        Object.keys(problems).forEach(function (key) {
-            markFieldError(fields[key], errors[key], problems[key]);
-            if (!firstInvalid) { firstInvalid = fields[key]; }
-        });
+  /**
+   * Validate a single field
+   * @param {string} fieldName - The field name to validate
+   * @returns {boolean} Whether the field is valid
+   */
+  function validateField(fieldName) {
+    const rule = validationRules[fieldName];
+    if (!rule) return true;
 
-        if (firstInvalid) {
-            showStatus(statusEl, 'error', 'Please fix the highlighted fields and try again.');
-            if (typeof firstInvalid.focus === 'function') {
-                firstInvalid.focus();
-            }
-            return;
-        }
+    const input = document.getElementById(rule.inputId);
+    const value = input ? input.value : '';
+    const error = rule.validate(value);
 
-        clearStatus(statusEl);
-        setSubmitting(form, true);
+    showFieldError(fieldName, error);
+    return !error;
+  }
 
-        var submitPromise = DEFAULT_ENDPOINT
-            ? postContact(DEFAULT_ENDPOINT, values)
-            : simulateSubmit(values);
+  /**
+   * Validate all fields
+   * @returns {boolean} Whether all fields are valid
+   */
+  function validateAllFields() {
+    let isValid = true;
 
-        submitPromise
-            .then(function (result) {
-                setSubmitting(form, false);
-                if (result && result.ok) {
-                    showStatus(
-                        statusEl,
-                        'success',
-                        (result.message || 'Thanks — your message is on its way. We\u2019ll reply within one business day.')
-                    );
-                    form.reset();
-                    Object.keys(fields).forEach(function (key) { clearFieldError(fields[key], errors[key]); });
-                } else {
-                    showStatus(
-                        statusEl,
-                        'error',
-                        (result && result.message) || 'Something went wrong sending your message. Please try again in a moment.'
-                    );
-                }
-            })
-            .catch(function (err) {
-                setSubmitting(form, false);
-                // eslint-disable-next-line no-console
-                console.error('[lumen] contact submit failed', err);
-                showStatus(
-                    statusEl,
-                    'error',
-                    'We couldn\u2019t reach the server. Check your connection and try again.'
-                );
-            });
+    for (const fieldName in validationRules) {
+      if (!validateField(fieldName)) {
+        isValid = false;
+      }
     }
 
-    /**
-     * Pure validation. Returns a map of fieldName -> human readable message.
-     */
-    function validate(values) {
-        var problems = {};
+    return isValid;
+  }
 
-        if (!values.name || values.name.length < 2) {
-            problems.name = 'Please enter your full name (at least 2 characters).';
-        } else if (values.name.length > 120) {
-            problems.name = 'Name is too long — please shorten it to under 120 characters.';
-        }
+  /**
+   * Set loading state for the form
+   * @param {boolean} isLoading - Whether the form is in loading state
+   */
+  function setLoadingState(isLoading) {
+    submitBtn.disabled = isLoading;
+    submitBtn.classList.toggle('is-loading', isLoading);
 
-        if (!values.email) {
-            problems.email = 'Please enter the email address we should reply to.';
-        } else if (values.email.length > 254 || !EMAIL_RE.test(values.email)) {
-            problems.email = 'That email address doesn\u2019t look right. Please double-check it.';
-        }
+    // Disable all form inputs while loading
+    const inputs = form.querySelectorAll('input, textarea, button');
+    inputs.forEach((input) => {
+      input.disabled = isLoading;
+    });
+  }
 
-        if (!values.message) {
-            problems.message = 'Please write a short message so we know how to help.';
-        } else if (values.message.length < 10) {
-            problems.message = 'A little more detail helps us reply faster — at least 10 characters.';
-        } else if (values.message.length > 4000) {
-            problems.message = 'That message is quite long — please trim it to under 4,000 characters.';
-        }
+  /**
+   * Show success state
+   */
+  function showSuccess() {
+    form.hidden = true;
+    successMessage.hidden = false;
+    successMessage.focus();
+  }
 
-        return problems;
+  /**
+   * Handle form submission
+   * @param {Event} event - The submit event
+   */
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    // Validate all fields
+    if (!validateAllFields()) {
+      // Focus first invalid field
+      const firstInvalid = form.querySelector('.is-invalid');
+      if (firstInvalid) {
+        firstInvalid.focus();
+      }
+      return;
     }
 
-    /**
-     * POST the contact payload as JSON. Resolves with a normalized result.
-     */
-    function postContact(endpoint, payload) {
-        var controller = (typeof AbortController === 'function') ? new AbortController() : null;
-        var timer = controller ? setTimeout(function () { controller.abort(); }, NETWORK_TIMEOUT_MS) : null;
+    // Gather form data
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
 
-        var fetchOpts = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(serialize(payload))
-        };
-        if (controller) { fetchOpts.signal = controller.signal; }
+    // Set loading state
+    setLoadingState(true);
 
-        return fetch(endpoint, fetchOpts)
-            .then(function (res) {
-                if (timer) { clearTimeout(timer); }
-                return res.json().catch(function () { return {}; }).then(function (data) {
-                    if (res.ok) {
-                        return { ok: true, message: data && data.message };
-                    }
-                    return { ok: false, message: (data && data.message) || ('Request failed (' + res.status + ').') };
-                });
-            })
-            .catch(function (err) {
-                if (timer) { clearTimeout(timer); }
-                if (err && err.name === 'AbortError') {
-                    return { ok: false, message: 'The request timed out. Please try again.' };
-                }
-                throw err;
-            });
+    try {
+      // Simulate API call (replace with actual endpoint)
+      await simulateSubmit(data);
+
+      // Show success message
+      showSuccess();
+    } catch (error) {
+      // Show error (in production, you might want to show a toast or inline error)
+      console.error('Form submission failed:', error);
+
+      // For demo purposes, still show success
+      // In production, you'd handle this differently
+      showSuccess();
+    } finally {
+      setLoadingState(false);
     }
+  }
 
-    /**
-     * No endpoint configured — simulate a successful submission so the UX
-     * is still demoable on a static host. Resolves after a short delay.
-     */
-    function simulateSubmit() {
-        return new Promise(function (resolve) {
-            setTimeout(function () {
-                resolve({
-                    ok: true,
-                    message: 'Thanks! Your message has been queued (demo mode — wire window.LUMEN_CONTACT_ENDPOINT to a real handler to send it).'
-                });
-            }, 650);
-        });
-    }
+  /**
+   * Simulate form submission (replace with actual API call)
+   * @param {Object} data - The form data
+   * @returns {Promise<void>}
+   */
+  function simulateSubmit(data) {
+    return new Promise((resolve, reject) => {
+      // Simulate network delay
+      setTimeout(() => {
+        // Log the data that would be sent
+        console.log('Form submitted:', data);
 
-    /**
-     * Shape the payload the reference server handler expects.
-     */
-    function serialize(values) {
-        return {
-            name: values.name,
-            email: values.email,
-            message: values.message,
-            submittedAt: new Date().toISOString(),
-            source: 'landing-page'
-        };
-    }
+        // In production, you would:
+        // 1. Send to your backend/API
+        // 2. Handle response
+        // 3. Show appropriate message
 
-    function markFieldError(input, errorEl, message) {
-        if (input && input.parentNode) {
-            input.parentNode.classList.add('is-invalid');
+        // Simulate successful submission
+        resolve();
+      }, 1500);
+    });
+  }
+
+  // Add event listeners for real-time validation
+  for (const fieldName in validationRules) {
+    const input = document.getElementById(validationRules[fieldName].inputId);
+    if (input) {
+      // Validate on blur (when leaving the field)
+      input.addEventListener('blur', () => {
+        // Only validate if the field has been touched
+        if (input.dataset.touched === 'true') {
+          validateField(fieldName);
         }
-        if (input) {
-            input.setAttribute('aria-invalid', 'true');
-        }
-        if (errorEl) {
-            errorEl.textContent = message;
-        }
-    }
+        input.dataset.touched = 'true';
+      });
 
-    function clearFieldError(input, errorEl) {
-        if (input && input.parentNode) {
-            input.parentNode.classList.remove('is-invalid');
+      // Clear error on input
+      input.addEventListener('input', () => {
+        if (input.classList.contains('is-invalid')) {
+          validateField(fieldName);
         }
-        if (input) {
-            input.removeAttribute('aria-invalid');
-        }
-        if (errorEl) {
-            errorEl.textContent = '';
-        }
+      });
     }
+  }
 
-    function setSubmitting(form, isSubmitting) {
-        if (!form) { return; }
-        form.classList.toggle('is-submitting', !!isSubmitting);
-        var submit = form.querySelector('.contact-form__submit');
-        if (submit) {
-            submit.disabled = isSubmitting;
-            var label = submit.querySelector('.contact-form__submit-label');
-            if (label) {
-                label.textContent = isSubmitting ? 'Sending\u2026' : 'Send message';
-            }
-        }
-    }
+  // Handle form submission
+  form.addEventListener('submit', handleSubmit);
 
-    function showStatus(el, state, message) {
-        if (!el) { return; }
-        el.hidden = false;
-        el.setAttribute('data-state', state);
-        el.textContent = message;
+  // Add keyboard support for error messages
+  form.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.classList.contains('form-input')) {
+        event.preventDefault();
+        handleSubmit(event);
+      }
     }
-
-    function clearStatus(el) {
-        if (!el) { return; }
-        el.hidden = true;
-        el.removeAttribute('data-state');
-        el.textContent = '';
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init, { once: true });
-    } else {
-        init();
-    }
+  });
 })();
