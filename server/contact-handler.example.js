@@ -1,37 +1,171 @@
-### Notable files
+// helix: server/contact-handler.example.js
+// Reference Node.js handler for the Lumen contact form.
+// This file documents the expected POST /api/contract request/response shape.
+// It is *not* loaded by the static site — copy and adapt it for your backend.
 
-- **`public/index.html`** — The full landing page document. Contains the
-  `<header>` hero, the `<section id="features">` grid, and the
-  `<section id="contact">` form, plus semantic landmarks and accessible labels.
-- **`public/styles.css`** — Shared stylesheet referenced from `index.html`.
-  Pairs with the section-scoped stylesheets in `styles/` for organization.
-- **`scripts/main.js`** — Lightweight bootstrap that runs on `DOMContentLoaded`
-  to wire up shared UI affordances (smooth-scroll, etc.).
-- **`scripts/contact.js`** — Handles client-side validation for the contact
-  form and POSTs the payload as JSON to the configured endpoint. Reads
-  `window.LUMEN_CONTACT_ENDPOINT` at startup (defaults to `/api/contact`).
-- **`server/contact-handler.example.js`** — Reference implementation of a
-  minimal Node.js HTTP handler that accepts the contact form's POST request
-  and returns a JSON acknowledgement. Copy and adapt it if you want a real
-  backend; it is not started by `npm start`.
+/**
+ * Wire it up however you like. Example with the built-in `http` module:
+ *
+ *   const http = require("http");
+ *   const { handleContact } = require("./server/contact-handler.example.js");
+ *
+ *   http.createServer(async (req, res) => {
+ *     if (req.method === "POST" && req.url === "/api/contact") {
+ *       return handleContact(req, res);
+ *     }
+ *     res.statusCode = 404;
+ *     res.end("Not found");
+ *   }).listen(3000);
+ *
+ * Request body (JSON):
+ *   {
+ *     "name":       "Ada Lovelace",     // required, 2..120 chars
+ *     "email":      "ada@example.com",  // required, valid email, <=254 chars
+ *     "company":    "Lumen",            // optional, <=160 chars
+ *     "message":    "10..4000 chars",   // required
+ *     "submittedAt": "2024-01-01T00:00:00.000Z"  // client ISO timestamp
+ *   }
+ *
+ * Response on success (HTTP 200):
+ *   { "ok": true,  "message": "Thanks — we'll be in touch within one business day." }
+ *
+ * Response on validation error (HTTP 400):
+ *   { "ok": false, "error": "Please provide a valid email address." }
+ *
+ * Response on server error (HTTP 500):
+ *   { "ok": false, "error": "Something went wrong on our end. Please try again." }
+ */
 
-## What was built
+const http = require("http");
 
-This board delivered the three core regions of the Lumen landing page, plus
-the supporting form pipeline:
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const MAX_BODY_BYTES = 16 * 1024; // 16 KB is plenty for a contact form.
 
-- **Hero section** — Top-of-page hero region with headline, supporting
-  subheadline, primary CTA, and supporting visual area. Uses modern
-  typography (Inter), a polished gradient background, and a responsive
-  layout that adapts cleanly between desktop and mobile breakpoints.
-- **Features section** — Mid-page features grid presenting 3–6 capability
-  cards, each with an icon, a short title, and a short description. The grid
-  collapses to one column on mobile and expands to multiple columns on
-  tablet and desktop, while reusing the page's polished background treatment.
-- **Contact form** — Bottom contact section with a heading, prompt, and a
-  form containing name, email, and message fields plus a submit button.
-  Uses accessible label associations, basic client-side validation, and the
-  same polished background as the rest of the page. Submission is wired to
-  a configurable POST endpoint (`/api/contact` by default) with the
-  `server/contact-handler.example.js` reference documenting the expected
-  request and response shape.
+function sendJson(res, statusCode, body) {
+  const payload = JSON.stringify(body);
+  res.statusCode = statusCode;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  res.end(payload);
+}
+
+function validate(payload) {
+  if (!payload || typeof payload !== "object") {
+    return "Request body must be JSON.";
+  }
+  const name = String(payload.name || "").trim();
+  const email = String(payload.email || "").trim();
+  const company = String(payload.company || "").trim();
+  const message = String(payload.message || "").trim();
+
+  if (!name || name.length < 2 || name.length > 120) {
+    return "Please provide your full name.";
+  }
+  if (!email || email.length > 254 || !EMAIL_RE.test(email)) {
+    return "Please provide a valid email address.";
+  }
+  if (company.length > 160) {
+    return "Company name is too long.";
+  }
+  if (!message || message.length < 10 || message.length > 4000) {
+    return "Please share a message between 10 and 4000 characters.";
+  }
+  return null;
+}
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let received = 0;
+    const chunks = [];
+    req.on("data", (chunk) => {
+      received += chunk.length;
+      if (received > MAX_BODY_BYTES) {
+        reject(new Error("Payload too large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => {
+      const raw = Buffer.concat(chunks).toString("utf8");
+      if (!raw) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(raw));
+      } catch (_err) {
+        reject(new Error("Invalid JSON"));
+      }
+    });
+    req.on("error", reject);
+  });
+}
+
+/**
+ * Handle a POST /api/contact request.
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse} res
+ */
+async function handleContact(req, res) {
+  // Only POST is allowed.
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return sendJson(res, 405, { ok: false, error: "Method not allowed." });
+  }
+
+  let payload;
+  try {
+    payload = await readJsonBody(req);
+  } catch (err) {
+    const msg = err && err.message === "Payload too large"
+      ? "Message is too long."
+      : "Malformed JSON payload.";
+    return sendJson(res, 400, { ok: false, error: msg });
+  }
+
+  const validationError = validate(payload);
+  if (validationError) {
+    return sendJson(res, 400, { ok: false, error: validationError });
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // Replace this stub with your real delivery (email, CRM, queue, etc.).
+  // ────────────────────────────────────────────────────────────────────────────
+  try {
+    // await deliverToInbox(payload);
+    console.log("[contact-handler] received submission:", {
+      name: payload.name,
+      email: payload.email,
+      company: payload.company,
+      submittedAt: payload.submittedAt,
+    });
+  } catch (_err) {
+    return sendJson(res, 500, {
+      ok: false,
+      error: "Something went wrong on our end. Please try again.",
+    });
+  }
+
+  return sendJson(res, 200, {
+    ok: true,
+    message: "Thanks — we'll be in touch within one business day.",
+  });
+}
+
+module.exports = { handleContact, validate };
+
+// Allow running this file directly for a quick local smoke test:
+if (require.main === module) {
+  const port = Number(process.env.PORT) || 3000;
+  http
+    .createServer((req, res) => {
+      if (req.method === "POST" && req.url === "/api/contact") {
+        return handleContact(req, res);
+      }
+      sendJson(res, 404, { ok: false, error: "Not found." });
+    })
+    .listen(port, () => {
+      console.log(`[contact-handler] listening on http://localhost:${port}`);
+    });
+}

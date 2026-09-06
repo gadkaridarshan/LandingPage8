@@ -1,11 +1,13 @@
 {
-  "name": "landingpage8",
-  "version": "0.1.0",
+  "name": "lumen-landingpage8",
+  "version": "1.0.0",
   "private": true,
-  "description": "Lumen — a polished single-page marketing site with hero, features, and contact form.",
-  "type": "module",
+  "description": "Lumen — a polished, single-page marketing site (HTML, CSS, vanilla JS).",
   "scripts": {
     "start": "npx --yes serve -l 4173 .",
-    "typecheck:js": "node --check scripts/contact.js && node --check scripts/main.js && node --check server/contact-handler.example.js"
+    "typecheck:js": "node --check scripts/main.js && node --check scripts/contact.js && node --check server/contact-handler.example.js"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

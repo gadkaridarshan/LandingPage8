@@ -1,41 +1,33 @@
 // helix: scripts/main.js
-// Minimal landing-page bootstrap: footer year + smooth in-page navigation.
-
+// Lightweight site behavior — header year + smooth in-page anchors.
 (function () {
-    "use strict";
+  "use strict";
 
-    function setYear() {
-        var yearEl = document.getElementById("year");
-        if (yearEl) {
-            yearEl.textContent = String(new Date().getFullYear());
+  function init() {
+    var yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+    // Smooth-scroll for in-page anchor links that target an existing section.
+    var anchors = document.querySelectorAll('a[href^="#"]');
+    for (var i = 0; i < anchors.length; i++) {
+      anchors[i].addEventListener("click", function (event) {
+        var href = this.getAttribute("href");
+        if (!href || href === "#" || href.length < 2) return;
+        var target = document.getElementById(href.slice(1));
+        if (!target) return;
+        event.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (target.setAttribute) {
+          target.setAttribute("tabindex", "-1");
+          target.focus({ preventScroll: true });
         }
+      });
     }
+  }
 
-    function bindSmoothAnchors() {
-        var anchors = document.querySelectorAll('a[href^="#"]');
-        Array.prototype.forEach.call(anchors, function (anchor) {
-            anchor.addEventListener("click", function (event) {
-                var href = anchor.getAttribute("href");
-                if (!href || href === "#") return;
-                var target = document.querySelector(href);
-                if (!target) return;
-                event.preventDefault();
-                target.scrollIntoView({ behavior: "smooth", block: "start" });
-                if (typeof target.focus === "function") {
-                    target.setAttribute("tabindex", "-1");
-                    target.focus({ preventScroll: true });
-                }
-            });
-        });
-    }
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", function () {
-            setYear();
-            bindSmoothAnchors();
-        });
-    } else {
-        setYear();
-        bindSmoothAnchors();
-    }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();
